@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<doc>
+  <category verify="true" type="str" auto="true">В мире</category>
+  <title verify="true" type="str" auto="true">На юге Ирана произошло землетрясение магнитудой 5,6</title>
+  <DateAndTime verify="true" type="str" auto="true">10:15 18.04.2021</DateAndTime>
+  <views verify="true" type="str" auto="true">2493</views>
+  <text verify="true" type="str" auto="true"><![CDATA[МОСКВА, 18 апр - РИА Новости. Землетрясение магнитудой 5,6 произошло на юге Ирана, сообщает Европейско-Средиземноморский сейсмологический центр (EMSC).Землетрясение было зафиксировано в 06.41 по времени UTC (09.41 мск). Эпицентр подземных толчков располагался в 103 километрах к северо-западу от города Бушер, очаг залегал на глубине пять километров.Информация о возможных жертвах и разрушениях не поступала.]]></text>
+  <tags verify="true" type="str" auto="true">Европейско-Средиземноморский сейсмологический центр (EMSC),Бушер,Иран,В мире</tags>
+</doc>
