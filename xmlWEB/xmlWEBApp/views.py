@@ -14,8 +14,28 @@ def index(request):
 
 
 def xml(request, any):
-    file = open("xmlWEBApp/xml/" + str(any) + ".xml", "r", encoding="utf-8")
-    # for line in file:
-    #     textXml.append(line)
-    textXml = file.read()
-    return render(request, "xmlPlace.html", {"nameXml": any, "textXml": textXml})
+    # file = open("xmlWEBApp/xml/" + str(any) + ".xml", "r", encoding="utf-8")
+
+    myDoc = Etree.parse("xmlWEBApp/xml/" + str(any) + ".xml")
+    category = myDoc.find("./category").text
+    title = myDoc.find("./title").text
+    dateAndTime = myDoc.find("./DateAndTime").text
+    views = myDoc.find("./views").text
+    text = myDoc.find("./text").text
+    tags = myDoc.find("./tags").text
+
+    # textXml = file.read()
+    return render(request, "xmlPlace.html",
+                  {"nameXml": any,
+                   "category": category,
+                   "title": title,
+                   "dateAndTime": dateAndTime,
+                   "views": views,
+                   "text": text,
+                   "tags": tags})
+
+
+def saveChange(request):
+    if request.method == "post":
+        return HttpResponse("б")
+    return HttpResponse("а")
