@@ -1,8 +1,9 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import os
 import xml.etree.ElementTree as Etree
-
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 # Create your views here.
 def index(request):
@@ -36,6 +37,8 @@ def xml(request, any):
 
 
 def saveChange(request):
-    if request.method == "post":
-        return HttpResponse("б")
-    return HttpResponse("а")
+    if request.method == 'POST' and request.is_ajax():
+        data = request.body.decode('utf-8')
+        jsonData = json.loads(data)
+        print(jsonData["category"])
+        return HttpResponse("Ответ")
