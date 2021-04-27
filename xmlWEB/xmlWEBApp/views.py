@@ -1,9 +1,17 @@
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 import os
 import xml.etree.ElementTree as Etree
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.contrib import messages
+
+
+def get_current_path(request):
+    return {
+        'current_path': request.get_full_path()
+    }
+
 
 # Create your views here.
 def index(request):
@@ -40,5 +48,21 @@ def saveChange(request):
     if request.method == 'POST' and request.is_ajax():
         data = request.body.decode('utf-8')
         jsonData = json.loads(data)
-        print(jsonData["category"])
-        return HttpResponse("Ответ")
+        changeCategory = jsonData["category"]
+        changeTitle = jsonData["title"]
+        changeDateAndTime = jsonData["dateAndTime"]
+        changeViews = jsonData["views"]
+        changeText = jsonData["text"]
+        changeTag = jsonData["tags"]
+        nameFile = jsonData["nameFile"]
+        myDoc = Etree.parse("xmlWEBApp/xml/" + str(nameFile) + ".xml")
+        myDoc.find("./category").text = changeCategory
+        myDoc.find("./title").text = changeTitle
+        myDoc.find("./DateAndTime").text = changeDateAndTime
+        myDoc.find("./views").text = changeViews
+        myDoc.find("./text").text = changeText
+        myDoc.find("./tags").text = changeTag
+        pathToRedirect = "/" + str(nameFile) + ".xml" + "/"
+        myDoc.write("xmlWEBApp/xml/" + str(nameFile) + ".xml", encoding="utf-8")
+        messages.success(request, 'Изменения сохранены')
+        return HttpResponse(200)

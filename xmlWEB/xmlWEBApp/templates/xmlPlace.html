@@ -3,18 +3,35 @@
 {% block javascript %}
 <script type="text/javascript">
   function saveChange() {
+
     const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     var xhr = new XMLHttpRequest();
+    xhr.onload = (e) => {
+        window.location="";
+    };
     xhr.open("POST", "/saveChange/", true);
     xhr.setRequestHeader("X-CSRFToken", csrftoken);
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
     var category = document.getElementById("category").textContent;
+    var title = document.getElementById("title").textContent;
+    var dateAndTime = document.getElementById("dateAndTime").textContent;
+    var views = document.getElementById("views").textContent;
+    var text = document.getElementById("text").textContent;
+    var tags = document.getElementById("tags").textContent;
+    var nameFile = "{{nameXml}}"
+
+
     data = {
-      "category":category
+      "category":category,
+      "title":title,
+      "dateAndTime":dateAndTime,
+      "views":views,
+      "text":text,
+      "tags":tags,
+      "nameFile":nameFile
     };
     xhr.send(JSON.stringify(data));
-
 }
 </script>
 {% endblock %}
@@ -30,7 +47,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <h1>Имя xml файла - {{nameXml}}</h1>
+          <h1 id="nameFile">Имя xml файла - {{nameXml}}</h1>
         </div>
       </div>
     </div>
@@ -59,20 +76,23 @@
                   <td contenteditable id="title">{{title}}</td>
                 </tr>
                 <tr>
+                      {% for message in messages %}
+                          {{ message }}
+                      {% endfor %}
                   <td>Дата и время публикации</td>
-                  <td contenteditable>{{dateAndTime}}</td>
+                  <td contenteditable id="dateAndTime">{{dateAndTime}}</td>
                 </tr>
                 <tr>
                   <td>Количество просмотров на момент сбора</td>
-                  <td contenteditable>{{views}}</td>
+                  <td contenteditable id="views">{{views}}</td>
                 </tr>
                 <tr>
                   <td>Текст статьи</td>
-                  <td contenteditable>{{text}}</td>
+                  <td contenteditable id="text">{{text}}</td>
                 </tr>
                  <tr>
                   <td>Теги статьи</td>
-                  <td contenteditable>{{tags}}</td>
+                  <td contenteditable id="tags">{{tags}}</td>
                 </tr>
               </tbody>
             </table>
