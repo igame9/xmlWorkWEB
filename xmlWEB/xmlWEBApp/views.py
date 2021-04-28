@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 import os
 import xml.etree.ElementTree as Etree
-from django.views.decorators.csrf import csrf_exempt
+# from django.views.decorators.csrf import csrf_exempt
 import json
 from django.contrib import messages
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 def get_current_path(request):
@@ -62,7 +63,7 @@ def saveChange(request):
         myDoc.find("./views").text = changeViews
         myDoc.find("./text").text = changeText
         myDoc.find("./tags").text = changeTag
-        pathToRedirect = "/" + str(nameFile) + ".xml" + "/"
+        # pathToRedirect = "/" + str(nameFile) + ".xml" + "/"
         myDoc.write("xmlWEBApp/xml/" + str(nameFile) + ".xml", encoding="utf-8")
         messages.success(request, 'Изменения сохранены')
         return HttpResponse(200)
