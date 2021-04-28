@@ -13,6 +13,7 @@
     xhr.setRequestHeader("X-CSRFToken", csrftoken);
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
     var category = document.getElementById("category").textContent;
     var title = document.getElementById("title").textContent;
     var dateAndTime = document.getElementById("dateAndTime").textContent;
@@ -21,7 +22,6 @@
     var tags = document.getElementById("tags").textContent;
     var nameFile = "{{nameXml}}"
 
-
     data = {
       "category":category,
       "title":title,
@@ -29,6 +29,25 @@
       "views":views,
       "text":text,
       "tags":tags,
+      "nameFile":nameFile
+    };
+    xhr.send(JSON.stringify(data));
+    return false;
+}
+
+function deleteXml() {
+
+    const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    var xhr = new XMLHttpRequest();
+        xhr.onload = (e) => {
+        window.location="";
+    };
+    xhr.open("DELETE", "/deleteFile/", true);
+    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    var nameFile = "{{nameXml}}"
+    data = {
       "nameFile":nameFile
     };
     xhr.send(JSON.stringify(data));
@@ -98,12 +117,13 @@
               </tbody>
             </table>
             <input type="submit" name="submit" value="Сохранить">
+		    <input onclick="deleteXml()" type="button" value="Удалить данный файл">
           </div>
         </div>
       </div>
     </div>
   </div>
-  </form>>
+  </form>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>

@@ -1,6 +1,24 @@
 <!DOCTYPE html>
 <html>
+<style>
+   .likeAButton {
+    border: 1px solid #333;
+    display: inline-block;
+    padding: 1px 25px;
+    text-decoration: none;
+    color: #000;
+  }
+    .likeAButton:hover {
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    background: linear-gradient(to right, #00ecd6, #f2f3f4);
+    color: #000;
+    text-decoration: none;
+   }
+   .pagination{
+   margin: 1%;
 
+   }
+</style>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -24,23 +42,23 @@
         <div class="col-md-12">
           <div class="list-group" style="">
             {% for xmlPag in xmlPag %}
-              {# Each "contact" is a Contact model object. #}
+              {# Each "xmlPag" in xmlPagList. #}
               {{ xmlPag.full_name|upper }}<br />
               <a href="{{xmlPag}}" class="list-group-item list-group-item-action active" contenteditable="false">{{xmlPag}}</a>
             {% endfor %}
               <div class="pagination">
                   <span class="step-links">
                       {% if xmlPag.has_previous %}
-                          <a href="?page={{ xmlPag.previous_page_number }}">Предыдущая страница</a>
+                          <a class="likeAButton" href="?page={{ xmlPag.previous_page_number }}">Предыдущая страница</a>
+                      {% endif %}
+
+                      {% if xmlPag.has_next %}
+                          <a class="likeAButton" href="?page={{ xmlPag.next_page_number }}">Следущая страница</a>
                       {% endif %}
 
                       <span class="current">
                           Страница {{ xmlPag.number }} из {{ xmlPag.paginator.num_pages }}
                       </span>
-
-                      {% if xmlPag.has_next %}
-                          <a href="?page={{ xmlPag.next_page_number }}">Следущая страница</a>
-                      {% endif %}
                   </span>
               </div>
           </div>

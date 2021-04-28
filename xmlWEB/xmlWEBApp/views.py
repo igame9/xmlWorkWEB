@@ -6,6 +6,8 @@ import xml.etree.ElementTree as Etree
 import json
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.urls import reverse
+from django.core.exceptions import SuspiciousOperation
 
 
 def get_current_path(request):
@@ -35,24 +37,26 @@ def index(request):
 
 def xml(request, any):
     # file = open("xmlWEBApp/xml/" + str(any) + ".xml", "r", encoding="utf-8")
+    try:
+        myDoc = Etree.parse("xmlWEBApp/xml/" + str(any) + ".xml")
+        category = myDoc.find("./category").text
+        title = myDoc.find("./title").text
+        dateAndTime = myDoc.find("./DateAndTime").text
+        views = myDoc.find("./views").text
+        text = myDoc.find("./text").text
+        tags = myDoc.find("./tags").text
 
-    myDoc = Etree.parse("xmlWEBApp/xml/" + str(any) + ".xml")
-    category = myDoc.find("./category").text
-    title = myDoc.find("./title").text
-    dateAndTime = myDoc.find("./DateAndTime").text
-    views = myDoc.find("./views").text
-    text = myDoc.find("./text").text
-    tags = myDoc.find("./tags").text
-
-    # textXml = file.read()
-    return render(request, "xmlPlace.html",
-                  {"nameXml": any,
-                   "category": category,
-                   "title": title,
-                   "dateAndTime": dateAndTime,
-                   "views": views,
-                   "text": text,
-                   "tags": tags})
+        # textXml = file.read()
+        return render(request, "xmlPlace.html",
+                      {"nameXml": any,
+                       "category": category,
+                       "title": title,
+                       "dateAndTime": dateAndTime,
+                       "views": views,
+                       "text": text,
+                       "tags": tags})
+    except FileNotFoundError:
+        return HttpResponseRedirect(reverse('xmlWEBApp:_indexPage_'))
 
 
 def saveChange(request):
@@ -77,3 +81,15 @@ def saveChange(request):
         myDoc.write("xmlWEBApp/xml/" + str(nameFile) + ".xml", encoding="utf-8")
         messages.success(request, 'Изменения сохранены')
         return HttpResponse(200)
+
+
+def deleteFile(request):
+    if request.method == 'DELETE' and request.is_ajax():
+        data = request.body.decode('utf-8')
+        jsonData = json.loads(data)
+        nameFile = jsonData["nameFile"]
+        print(nameFile)
+        path = os.path.join("./xmlWEBApp/xml/", str(nameFile) + ".xml")
+        os.remove(path)
+        return HttpResponse(200)
+
