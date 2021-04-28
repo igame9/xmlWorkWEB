@@ -23,9 +23,26 @@
       <div class="row">
         <div class="col-md-12">
           <div class="list-group" style="">
-              {% for xml in xmlList %}
-            <a href="{{xml}}" class="list-group-item list-group-item-action active" contenteditable="false">{{xml}}</a>
-              {% endfor %}
+            {% for xmlPag in xmlPag %}
+              {# Each "contact" is a Contact model object. #}
+              {{ xmlPag.full_name|upper }}<br />
+              <a href="{{xmlPag}}" class="list-group-item list-group-item-action active" contenteditable="false">{{xmlPag}}</a>
+            {% endfor %}
+              <div class="pagination">
+                  <span class="step-links">
+                      {% if xmlPag.has_previous %}
+                          <a href="?page={{ xmlPag.previous_page_number }}">Предыдущая страница</a>
+                      {% endif %}
+
+                      <span class="current">
+                          Страница {{ xmlPag.number }} из {{ xmlPag.paginator.num_pages }}
+                      </span>
+
+                      {% if xmlPag.has_next %}
+                          <a href="?page={{ xmlPag.next_page_number }}">Следущая страница</a>
+                      {% endif %}
+                  </span>
+              </div>
           </div>
         </div>
       </div>

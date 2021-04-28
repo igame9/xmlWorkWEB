@@ -20,7 +20,17 @@ def index(request):
     for root, dirs, files in os.walk("xmlWEBApp/xml"):
         for filename in files:
             listWithXml.append(filename)
-    return render(request, "index.html", {"xmlList": listWithXml})
+    paginator = Paginator(listWithXml, 10)
+    page = request.GET.get('page')
+    try:
+        xmlPag = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        xmlPag = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        xmlPag = paginator.page(paginator.num_pages)
+    return render(request, "index.html", {"xmlPag": xmlPag})
 
 
 def xml(request, any):
