@@ -2,14 +2,13 @@
 <html>
 {% block javascript %}
 <script type="text/javascript">
-  function saveChange() {
+  function createXML() {
 
     const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     var xhr = new XMLHttpRequest();
     xhr.onload = (e) => {
-        window.location="";
     };
-    xhr.open("POST", "/saveChange/", true);
+    xhr.open("POST", "/newXML/", true);
     xhr.setRequestHeader("X-CSRFToken", csrftoken);
     xhr.setRequestHeader("Content-typpye", "application/json");
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -20,7 +19,7 @@
     var views = document.getElementById("views").textContent;
     var text = document.getElementById("text").textContent;
     var tags = document.getElementById("tags").textContent;
-    var nameFile = "{{nameXml}}"
+    var nameFile = document.getElementById("nameFile").textContent;
 
     data = {
       "category":category,
@@ -31,28 +30,11 @@
       "tags":tags,
       "nameFile":nameFile
     };
+
     xhr.send(JSON.stringify(data));
     return false;
 }
 
-function deleteXml() {
-
-    const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-    var xhr = new XMLHttpRequest();
-        xhr.onload = (e) => {
-        window.location="";
-    };
-    xhr.open("DELETE", "/deleteFile/", true);
-    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    var nameFile = "{{nameXml}}"
-    data = {
-      "nameFile":nameFile
-    };
-    xhr.send(JSON.stringify(data));
-    return false;
-}
 </script>
 {% endblock %}
 
@@ -67,12 +49,12 @@ function deleteXml() {
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <h1 id="nameFile">Имя xml файла - {{nameXml}}</h1>
+          <h1>Создание новой статьи</h1>
         </div>
       </div>
     </div>
   </div>
-  <form onsubmit=saveChange()>
+  <form onsubmit="createXML()">
     {% csrf_token %}
   <div class="py-5">
     <div class="container">
@@ -89,35 +71,38 @@ function deleteXml() {
               <tbody>
                 <tr>
                   <td>Категория</td>
-                  <td contenteditable id="category">{{category}}</td>
+                  <td contenteditable id="category"></td>
                 </tr>
                 <tr>
                   <td>Заголовок</td>
-                  <td contenteditable id="title">{{title}}</td>
+                  <td contenteditable id="title"></td>
                 </tr>
                 <tr>
                       {% for message in messages %}
                           {{ message }}
                       {% endfor %}
                   <td>Дата и время публикации</td>
-                  <td contenteditable id="dateAndTime">{{dateAndTime}}</td>
+                  <td contenteditable id="dateAndTime"></td>
                 </tr>
                 <tr>
                   <td>Количество просмотров на момент сбора</td>
-                  <td contenteditable id="views">{{views}}</td>
+                  <td contenteditable id="views"></td>
                 </tr>
                 <tr>
                   <td>Текст статьи</td>
-                  <td contenteditable id="text">{{text}}</td>
+                  <td contenteditable id="text"></td>
                 </tr>
                  <tr>
                   <td>Теги статьи</td>
-                  <td contenteditable id="tags">{{tags}}</td>
+                  <td contenteditable id="tags"></td>
+                </tr>
+                 <tr>
+                  <td>Имя файла</td>
+                  <td contenteditable id="nameFile"></td>
                 </tr>
               </tbody>
             </table>
-            <input type="submit" name="submit" value="Сохранить">
-		    <input onclick="deleteXml()" type="button" value="Удалить данный файл">
+            <input type="submit" name="submit" value="Создать статью">
           </div>
         </div>
       </div>

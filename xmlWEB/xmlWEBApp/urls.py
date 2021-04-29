@@ -9,4 +9,5 @@ urlpatterns = [
     path('<str:any>.xml/', views.xml, name="_xmlWork_"),
     path('saveChange/', views.saveChange, name="_saveXml_"),
     path('deleteFile/', views.deleteFile, name="_deleteXML_"),
+    path('newXML/', views.newXML, name="_newXML_"),
 ]

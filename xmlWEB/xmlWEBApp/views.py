@@ -7,7 +7,6 @@ import json
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
-from django.core.exceptions import SuspiciousOperation
 
 
 def get_current_path(request):
@@ -93,3 +92,24 @@ def deleteFile(request):
         os.remove(path)
         return HttpResponse(200)
 
+
+def newXML(request):
+    if request.method == 'POST' and request.is_ajax():
+        data = request.body.decode('utf-8')
+        jsonData = json.loads(data)
+        nameFile = jsonData["nameFile"]
+        category = jsonData["category"]
+        title = jsonData["title"]
+        dateAndTime = jsonData["dateAndTime"]
+        views = jsonData["views"]
+        text = jsonData["text"]
+        tags = jsonData["tags"]
+        if nameFile == "" or category == "" or title == "" or dateAndTime == "" \
+                or views == "" or text == "" or tags == "":
+            messages.warning(request, "Требуется заполнить все данные")
+        else:
+            messages.success(request, 'Статья создана')
+        return HttpResponse("POST")
+
+    if request.method == 'GET':
+        return render(request, "newXML.html")
