@@ -40,8 +40,10 @@
   <div class="py-5">
     <div class="container">
         <label for="searchText">Имя</label>
-        <form>
-            <input type="text" id="searchText">
+        <form method="post" action="/findXML/">
+                {% csrf_token %}
+            <input type="text" id="searchText" name="reg">
+            <input type="submit" name="submit" value="Найти статьи">
         </form>
       <div class="row">
         <div class="col-md-12">
