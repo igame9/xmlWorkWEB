@@ -178,7 +178,6 @@ def findXML(request):
         page = request.GET.get('page')
         try:
             xmlPag = paginator.page(page)
-            request.session[0] = xmlPag
         except PageNotAnInteger:
             # If page is not an integer, deliver first page.
             xmlPag = paginator.page(1)
@@ -188,7 +187,6 @@ def findXML(request):
         return render(request, "index.html", {"xmlPag": xmlPag})
 
     if request.method == "GET":
-        print(request.session.keys)
         paginator = Paginator(request.session['data'], 15)
         page = request.GET.get('page')
         try:
