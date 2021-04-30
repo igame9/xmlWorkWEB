@@ -7,6 +7,17 @@
     const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     var xhr = new XMLHttpRequest();
     xhr.onload = (e) => {
+      var data = JSON.parse(e.target.response);
+      document.getElementById("message").textContent = data;
+      if (data === "Статья успешно создана"){
+          document.getElementById("category").textContent = "";
+          document.getElementById("title").textContent = "";
+          document.getElementById("dateAndTime").textContent = "";
+          document.getElementById("views").textContent = "";
+          document.getElementById("text").textContent = "";
+          document.getElementById("tags").textContent = "";
+          document.getElementById("nameFile").textContent = "";
+      }
     };
     xhr.open("POST", "/newXML/", true);
     xhr.setRequestHeader("X-CSRFToken", csrftoken);
@@ -54,7 +65,7 @@
       </div>
     </div>
   </div>
-  <form onsubmit="createXML()">
+  <form onsubmit="return false">
     {% csrf_token %}
   <div class="py-5">
     <div class="container">
@@ -63,6 +74,8 @@
           <div class="table-responsive">
             <table class="table">
               <thead>
+              <tr id="message">
+              </tr>
                 <tr>
                   <th>Обозначение</th>
                   <th>Данные</th>
@@ -102,7 +115,8 @@
                 </tr>
               </tbody>
             </table>
-            <input type="submit" name="submit" value="Создать статью">
+            <input type="submit" name="submit" value="Создать статью" onclick=createXML()>
+            <input type="button" value="На главную" onClick='location.href="/"'>
           </div>
         </div>
       </div>

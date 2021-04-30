@@ -1,12 +1,13 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-import os
-import xml.etree.ElementTree as Etree
-# from django.views.decorators.csrf import csrf_exempt
 import json
+import os
+
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
+from lxml import etree
 
 
 def get_current_path(request):
@@ -16,6 +17,7 @@ def get_current_path(request):
 
 
 # Create your views here.
+@csrf_exempt
 def index(request):
     listWithXml = []
     for root, dirs, files in os.walk("xmlWEBApp/xml"):
@@ -34,10 +36,11 @@ def index(request):
     return render(request, "index.html", {"xmlPag": xmlPag})
 
 
+@csrf_exempt
 def xml(request, any):
     # file = open("xmlWEBApp/xml/" + str(any) + ".xml", "r", encoding="utf-8")
     try:
-        myDoc = Etree.parse("xmlWEBApp/xml/" + str(any) + ".xml")
+        myDoc = etree.parse("xmlWEBApp/xml/" + str(any) + ".xml")
         category = myDoc.find("./category").text
         title = myDoc.find("./title").text
         dateAndTime = myDoc.find("./DateAndTime").text
@@ -54,7 +57,7 @@ def xml(request, any):
                        "views": views,
                        "text": text,
                        "tags": tags})
-    except FileNotFoundError:
+    except (FileNotFoundError, OSError):
         return HttpResponseRedirect(reverse('xmlWEBApp:_indexPage_'))
 
 
@@ -69,7 +72,7 @@ def saveChange(request):
         changeText = jsonData["text"]
         changeTag = jsonData["tags"]
         nameFile = jsonData["nameFile"]
-        myDoc = Etree.parse("xmlWEBApp/xml/" + str(nameFile) + ".xml")
+        myDoc = etree.parse("xmlWEBApp/xml/" + str(nameFile) + ".xml")
         myDoc.find("./category").text = changeCategory
         myDoc.find("./title").text = changeTitle
         myDoc.find("./DateAndTime").text = changeDateAndTime
@@ -87,7 +90,6 @@ def deleteFile(request):
         data = request.body.decode('utf-8')
         jsonData = json.loads(data)
         nameFile = jsonData["nameFile"]
-        print(nameFile)
         path = os.path.join("./xmlWEBApp/xml/", str(nameFile) + ".xml")
         os.remove(path)
         return HttpResponse(200)
@@ -100,16 +102,61 @@ def newXML(request):
         nameFile = jsonData["nameFile"]
         category = jsonData["category"]
         title = jsonData["title"]
-        dateAndTime = jsonData["dateAndTime"]
-        views = jsonData["views"]
+        dateTime = jsonData["dateAndTime"]
+        view = jsonData["views"]
         text = jsonData["text"]
         tags = jsonData["tags"]
-        if nameFile == "" or category == "" or title == "" or dateAndTime == "" \
-                or views == "" or text == "" or tags == "":
-            messages.warning(request, "Требуется заполнить все данные")
+        if nameFile == "" or category == "" or title == "" or dateTime == "" \
+                or view == "" or text == "" or tags == "":
+            # messages.warning(request, "Требуется заполнить все данные")
+            return HttpResponse(json.dumps("Необходимо  заполнить все данные"))
         else:
-            messages.success(request, 'Статья создана')
-        return HttpResponse("POST")
+            xmlData = etree.Element("doc")
+            # sourceXmlData = etree.SubElement(xmlData, "source")
+            # sourceXmlData.text = etree.CDATA(driver.current_url) ; запись источника данных
+
+            categoryXmlData = etree.SubElement(xmlData, "category")
+            categoryXmlData.attrib['verify'] = "true"
+            categoryXmlData.attrib['type'] = "str"
+            categoryXmlData.attrib['auto'] = "true"
+
+            titleXmlData = etree.SubElement(xmlData, "title")
+            titleXmlData.attrib['verify'] = "true"
+            titleXmlData.attrib['type'] = "str"
+            titleXmlData.attrib['auto'] = "true"
+
+            dateAndTime = etree.SubElement(xmlData, "DateAndTime")
+            dateAndTime.attrib['verify'] = "true"
+            dateAndTime.attrib['type'] = "str"
+            dateAndTime.attrib['auto'] = "true"
+
+            views = etree.SubElement(xmlData, "views")
+            views.attrib['verify'] = "true"
+            views.attrib['type'] = "str"
+            views.attrib['auto'] = "true"
+
+            textXmlData = etree.SubElement(xmlData, "text")
+            textXmlData.attrib['verify'] = "true"
+            textXmlData.attrib['type'] = "str"
+            textXmlData.attrib['auto'] = "true"
+
+            tagsXmlData = etree.SubElement(xmlData, "tags")
+            tagsXmlData.attrib['verify'] = "true"
+            tagsXmlData.attrib['type'] = "str"
+            tagsXmlData.attrib['auto'] = "true"
+
+            categoryXmlData.text = category
+            titleXmlData.text = str(title)
+            dateAndTime.text = str(dateTime)
+            views.text = str(view)
+            textXmlData.text = str(text)
+            tagsXmlData.text = str(tags)
+            nameFileXML = str(nameFile)
+
+            xmlTree = etree.ElementTree(xmlData)
+            xmlTree.write(r"./xmlWEBApp/xml/" + str(nameFileXML) + ".xml", encoding="utf-8", xml_declaration=True,
+                          pretty_print=True)
+            return HttpResponse(json.dumps("Статья успешно создана"))
 
     if request.method == 'GET':
         return render(request, "newXML.html")
