@@ -20,21 +20,22 @@ def get_current_path(request):
 # Create your views here.
 @csrf_exempt
 def index(request):
-    listWithXml = []
-    for root, dirs, files in os.walk("xmlWEBApp/xml"):
-        for filename in files:
-            listWithXml.append(filename)
-    paginator = Paginator(listWithXml, 10)
-    page = request.GET.get('page')
-    try:
-        xmlPag = paginator.page(page)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        xmlPag = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        xmlPag = paginator.page(paginator.num_pages)
-    return render(request, "index.html", {"xmlPag": xmlPag})
+    if request.method == "GET":
+        listWithXml = []
+        for root, dirs, files in os.walk("xmlWEBApp/xml"):
+            for filename in files:
+                listWithXml.append(filename)
+        paginator = Paginator(listWithXml, 10)
+        page = request.GET.get('page')
+        try:
+            xmlPag = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            xmlPag = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            xmlPag = paginator.page(paginator.num_pages)
+        return render(request, "index.html", {"xmlPag": xmlPag})
 
 
 @csrf_exempt
@@ -164,16 +165,31 @@ def newXML(request):
 
 
 def findXML(request):
-    listSearchFiles = []
-    data = request.POST.get("reg")
-    examplePattern = re.compile("(" + str(data) + ".+)")  # ("(.*" + "[" + str(data) + "]" + "+.*)")
-    for root, dirs, files in os.walk("xmlWEBApp/xml"):
-        for filename in files:
-            if examplePattern.fullmatch(filename):
-                listSearchFiles.append(str(filename))
-
     if request.method == 'POST':
+        listSearchFiles = []
+        data = request.POST.get("reg")
+        examplePattern = re.compile("(" + str(data) + ".+)")  # ("(.*" + "[" + str(data) + "]" + "+.*)")
+        for root, dirs, files in os.walk("xmlWEBApp/xml"):
+            for filename in files:
+                if examplePattern.fullmatch(filename):
+                    listSearchFiles.append(str(filename))
+        request.session['data'] = listSearchFiles
         paginator = Paginator(listSearchFiles, 15)
+        page = request.GET.get('page')
+        try:
+            xmlPag = paginator.page(page)
+            request.session[0] = xmlPag
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            xmlPag = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            xmlPag = paginator.page(paginator.num_pages)
+        return render(request, "index.html", {"xmlPag": xmlPag})
+
+    if request.method == "GET":
+        print(request.session.keys)
+        paginator = Paginator(request.session['data'], 15)
         page = request.GET.get('page')
         try:
             xmlPag = paginator.page(page)
@@ -183,4 +199,4 @@ def findXML(request):
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             xmlPag = paginator.page(paginator.num_pages)
-        return render(request, "index.html", {"xmlPag": xmlPag})
+        return render(request, "index.html", {"xmlPag":xmlPag})
