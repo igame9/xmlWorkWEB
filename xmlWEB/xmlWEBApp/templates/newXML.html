@@ -21,7 +21,7 @@
     };
     xhr.open("POST", "/newXML/", true);
     xhr.setRequestHeader("X-CSRFToken", csrftoken);
-    xhr.setRequestHeader("Content-typpye", "application/json");
+    xhr.setRequestHeader("Content-type", "application/json");
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
     var category = document.getElementById("category").textContent;

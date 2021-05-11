@@ -2,21 +2,23 @@
 <html>
 <style>
    .likeAButton {
-    border: 1px solid #333;
-    display: inline-block;
-    padding: 1px 25px;
-    text-decoration: none;
-    color: #000;
+        border: 1px solid #333;
+        display: inline-block;
+        padding: 1px 25px;
+        text-decoration: none;
+        color: #000;
   }
     .likeAButton:hover {
-    box-shadow: 0 0 5px rgba(0,0,0,0.3);
-    background: linear-gradient(to right, #00ecd6, #f2f3f4);
-    color: #000;
-    text-decoration: none;
+        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        background: linear-gradient(to right, #00ecd6, #f2f3f4);
+        color: #000;
+        text-decoration: none;
    }
    .pagination{
-   margin: 1%;
-
+        margin: 1%;
+   }
+   .date{
+        margin: 1%;
    }
 </style>
 <head>
@@ -42,7 +44,8 @@
         <label for="searchText">Имя</label>
         <form method="post" action="/findXML/">
                 {% csrf_token %}
-            <input type="text" id="searchText" name="reg">
+            <p><input type="text" id="searchText" name="reg"></p>
+            <p><input type="date" name="firstDate" id="startDate"> - <input type="date" name="secondDate"  id="endDate"></p>
             <input type="submit" name="submit" value="Найти статьи">
         </form>
       <div class="row">

@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from lxml import etree
 import re
+from datetime import date
 
 
 def get_current_path(request):
@@ -167,12 +168,45 @@ def newXML(request):
 def findXML(request):
     if request.method == 'POST':
         listSearchFiles = []
-        data = request.POST.get("reg")
+        data = request.POST.get("reg")  # nameFile
+        try:
+            startDate = request.POST.get("firstDate")
+            endDate = request.POST.get("secondDate")
+            if endDate == "":
+                endDate = startDate
+            if startDate == "":
+                startDate = endDate
+
+            yearStart, mothStart, dayStart = str(startDate).split("-")
+            convertedStartDate = date(int(yearStart), int(mothStart), int(dayStart))
+            yearEnd, mothEnd, dayEnd = str(endDate).split("-")
+            convertedEndDate = date(int(yearEnd), int(mothEnd), int(dayEnd))
+            print(convertedStartDate)
+            print(convertedEndDate)
+        except ValueError:
+            convertedStartDate = date(1900, 1, 1)
+            convertedEndDate = date(3000, 1, 1)
+            print(convertedStartDate)
+            print(convertedEndDate)
+
         examplePattern = re.compile("(" + str(data) + ".+)")  # ("(.*" + "[" + str(data) + "]" + "+.*)")
+        datePattern = re.compile(r"(\d*\.\d*\.\d*)")
         for root, dirs, files in os.walk("xmlWEBApp/xml"):
             for filename in files:
-                if examplePattern.fullmatch(filename):
-                    listSearchFiles.append(str(filename))
+                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
+                dateAndTime = myDoc.find("./DateAndTime").text
+                onlyDate = datePattern.findall(dateAndTime)
+                if onlyDate:
+                    day, month, year = str(onlyDate).replace("[", "").replace("]", "").replace("'", "").split(".")
+                    dateToDate = date(int(year), int(month), int(day))
+
+                    if examplePattern.fullmatch(filename) and convertedStartDate <= dateToDate <= convertedEndDate:
+                        listSearchFiles.append(str(filename))
+
+        # print(convertedStartDate)
+        # print(convertedEndDate)
+        # print(dateToDate)
+        listSearchFiles = list(set(listSearchFiles))
         request.session['data'] = listSearchFiles
         paginator = Paginator(listSearchFiles, 15)
         page = request.GET.get('page')
@@ -197,4 +231,4 @@ def findXML(request):
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             xmlPag = paginator.page(paginator.num_pages)
-        return render(request, "index.html", {"xmlPag":xmlPag})
+        return render(request, "index.html", {"xmlPag": xmlPag})

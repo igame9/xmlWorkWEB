@@ -11,7 +11,7 @@
     };
     xhr.open("POST", "/saveChange/", true);
     xhr.setRequestHeader("X-CSRFToken", csrftoken);
-    xhr.setRequestHeader("Content-typpye", "application/json");
+    xhr.setRequestHeader("Content-type", "application/json");
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
     var category = document.getElementById("category").textContent;
@@ -118,6 +118,7 @@ function deleteXml() {
             </table>
             <input type="submit" name="submit" value="Сохранить">
 		    <input onclick="deleteXml()" type="button" value="Удалить данный файл">
+            <input type="button" value="На главную" onClick='location.href="/"'>
           </div>
         </div>
       </div>
