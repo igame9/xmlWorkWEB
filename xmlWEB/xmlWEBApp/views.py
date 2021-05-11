@@ -169,25 +169,23 @@ def findXML(request):
     if request.method == 'POST':
         listSearchFiles = []
         data = request.POST.get("reg")  # nameFile
-        try:
-            startDate = request.POST.get("firstDate")
-            endDate = request.POST.get("secondDate")
-            if endDate == "":
-                endDate = startDate
-            if startDate == "":
-                startDate = endDate
 
-            yearStart, mothStart, dayStart = str(startDate).split("-")
-            convertedStartDate = date(int(yearStart), int(mothStart), int(dayStart))
-            yearEnd, mothEnd, dayEnd = str(endDate).split("-")
-            convertedEndDate = date(int(yearEnd), int(mothEnd), int(dayEnd))
-            print(convertedStartDate)
-            print(convertedEndDate)
-        except ValueError:
-            convertedStartDate = date(1900, 1, 1)
-            convertedEndDate = date(3000, 1, 1)
-            print(convertedStartDate)
-            print(convertedEndDate)
+        startDate = request.POST.get("firstDate")
+        endDate = request.POST.get("secondDate")
+        if endDate == "":
+            endDate = startDate
+        if startDate == "":
+            startDate = endDate
+        if startDate == "" and endDate == "":
+            startDate = "1000-04-04"
+            endDate = "3000-04-04"
+
+        yearStart, mothStart, dayStart = str(startDate).split("-")
+        convertedStartDate = date(int(yearStart), int(mothStart), int(dayStart))
+        yearEnd, mothEnd, dayEnd = str(endDate).split("-")
+        convertedEndDate = date(int(yearEnd), int(mothEnd), int(dayEnd))
+        # print(convertedStartDate)
+        # print(convertedEndDate)
 
         examplePattern = re.compile("(" + str(data) + ".+)")  # ("(.*" + "[" + str(data) + "]" + "+.*)")
         datePattern = re.compile(r"(\d*\.\d*\.\d*)")
