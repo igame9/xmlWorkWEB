@@ -47,6 +47,11 @@
             <p><input type="text" placeholder="Имя статьи" id="searchText" name="reg"></p>
             <p><input type="date" placeholder="Начальная дата" name="firstDate" id="startDate"> - <input type="date" name="secondDate"  id="endDate"></p>
             <p><input type="search" name="tags" placeholder="Возможные теги">
+            <p><select>
+                {% for tag in readyTags %}
+              <option>{{tag}}</option>
+                {% endfor %}
+            </select>
             <p><input type="submit" name="submit" value="Найти статьи">
         </form>
       <div class="row">

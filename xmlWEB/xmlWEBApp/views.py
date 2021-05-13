@@ -23,10 +23,20 @@ def get_current_path(request):
 def index(request):
     if request.method == "GET":
         listWithXml = []
+        categoryList = []
+        patternWords = re.compile("([А-Яа-я]+)")
         for root, dirs, files in os.walk("xmlWEBApp/xml"):
             for filename in files:
+                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
+                categoryArticles = myDoc.find("./category").text
+                categoryList.append(categoryArticles)
                 listWithXml.append(filename)
-        paginator = Paginator(listWithXml, 10)
+        # print(",".join(tagsList))
+        stringTags = ",".join(categoryList)
+        patternWords = re.compile("([А-Яа-я]+)")
+        readyTags = set(patternWords.findall(stringTags))
+
+        paginator = Paginator(listWithXml, 15)
         page = request.GET.get('page')
         try:
             xmlPag = paginator.page(page)
@@ -36,7 +46,8 @@ def index(request):
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             xmlPag = paginator.page(paginator.num_pages)
-        return render(request, "index.html", {"xmlPag": xmlPag})
+        return render(request, "index.html", {"xmlPag": xmlPag,
+                                              "readyTags": readyTags})
 
 
 @csrf_exempt
@@ -219,7 +230,6 @@ def findXML(request):
                         dateToDate = date(int(year), int(month), int(day))
                         if convertedStartDate <= dateToDate <= convertedEndDate:
                             listSearchFiles.append(str(filename))
-
         else:
             pass
 
