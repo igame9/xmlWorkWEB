@@ -174,50 +174,55 @@ def findXML(request):
         endDate = request.POST.get("secondDate")
         tags = request.POST.get("tags")
 
-        patternWords = re.compile("([А-Яа-я]+)")
-        enteredTags = patternWords.findall(tags)
-        flagMatchTag = 0
-        print(enteredTags)
-        if endDate == "":
-            endDate = startDate
-        if startDate == "":
-            startDate = endDate
-        if startDate == "" and endDate == "":
-            startDate = "1000-04-04"
-            endDate = "3000-04-04"
+        if tags != "":
+            for root, dirs, files in os.walk("xmlWEBApp/xml"):
+                for filename in files:
+                    myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
+                    patternWords = re.compile("([А-Яа-я]+)")
+                    enteredTags = patternWords.findall(tags)
+                    tagsArticles = myDoc.find("./tags").text
+                    tagsForCompare = patternWords.findall(tagsArticles)
+                    for tag in enteredTags:
+                        for cmpTag in tagsForCompare:
+                            if tag == cmpTag:
+                                # print("Равно")
+                                listSearchFiles.append(str(filename))
 
-        yearStart, mothStart, dayStart = str(startDate).split("-")
-        convertedStartDate = date(int(yearStart), int(mothStart), int(dayStart))
-        yearEnd, mothEnd, dayEnd = str(endDate).split("-")
-        convertedEndDate = date(int(yearEnd), int(mothEnd), int(dayEnd))
-        # print(convertedStartDate)
-        # print(convertedEndDate)
-
-        examplePattern = re.compile("(" + str(data) + ".+)")  # ("(.*" + "[" + str(data) + "]" + "+.*)")
-        datePattern = re.compile(r"(\d*\.\d*\.\d*)")
-        for root, dirs, files in os.walk("xmlWEBApp/xml"):
-            for filename in files:
-                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
-                dateAndTime = myDoc.find("./DateAndTime").text
-                onlyDate = datePattern.findall(dateAndTime)
-                tagsArticles = myDoc.find("./tags").text
-                tagsForCompare = patternWords.findall(tagsArticles)
-                for tag in enteredTags:
-                    for cmpTag in tagsForCompare:
-                        if tag == cmpTag:
-                            flagMatchTag = 1
-                            print("Равно")
-                            listSearchFiles.append(str(filename))
-                if onlyDate:
-                    day, month, year = str(onlyDate).replace("[", "").replace("]", "").replace("'", "").split(".")
-                    dateToDate = date(int(year), int(month), int(day))
-
-                    if examplePattern.match(filename) and convertedStartDate <= dateToDate <= convertedEndDate:
+        if data != "":
+            examplePattern = re.compile("(" + str(data) + ".+)")  # ("(.*" + "[" + str(data) + "]" + "+.*)")
+            for root, dirs, files in os.walk("xmlWEBApp/xml"):
+                for filename in files:
+                    if examplePattern.match(filename):
                         listSearchFiles.append(str(filename))
+        else:
+            pass
 
-        # print(convertedStartDate)
-        # print(convertedEndDate)
-        # print(dateToDate)
+        if startDate != "" or endDate != "":
+            if endDate == "":
+                endDate = startDate
+            if startDate == "":
+                startDate = endDate
+
+            datePattern = re.compile(r"(\d*\.\d*\.\d*)")
+            yearStart, mothStart, dayStart = str(startDate).split("-")
+            convertedStartDate = date(int(yearStart), int(mothStart), int(dayStart))
+            yearEnd, mothEnd, dayEnd = str(endDate).split("-")
+            convertedEndDate = date(int(yearEnd), int(mothEnd), int(dayEnd))
+            for root, dirs, files in os.walk("xmlWEBApp/xml"):
+                for filename in files:
+                    myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
+                    dateAndTime = myDoc.find("./DateAndTime").text
+                    onlyDate = datePattern.findall(dateAndTime)
+
+                    if onlyDate:
+                        day, month, year = str(onlyDate).replace("[", "").replace("]", "").replace("'", "").split(".")
+                        dateToDate = date(int(year), int(month), int(day))
+                        if convertedStartDate <= dateToDate <= convertedEndDate:
+                            listSearchFiles.append(str(filename))
+
+        else:
+            pass
+
         listSearchFiles = list(set(listSearchFiles))
         request.session['data'] = listSearchFiles
         paginator = Paginator(listSearchFiles, 15)
