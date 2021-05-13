@@ -33,7 +33,7 @@ def index(request):
                 listWithXml.append(filename)
         # print(",".join(tagsList))
         stringTags = ",".join(categoryList)
-        patternWords = re.compile("([А-Яа-я]+)")
+        patternWords = re.compile("([а-яА-Я0-9_ ]+)")
         readyTags = set(patternWords.findall(stringTags))
 
         paginator = Paginator(listWithXml, 15)
@@ -189,7 +189,7 @@ def findXML(request):
             for root, dirs, files in os.walk("xmlWEBApp/xml"):
                 for filename in files:
                     myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
-                    patternWords = re.compile("([А-Яа-я]+)")
+                    patternWords = re.compile("([А-Яа-я]+)")  # ([а-яА-Я0-9_ ]+)  ([А-Яа-я]+)
                     enteredTags = patternWords.findall(tags)
                     tagsArticles = myDoc.find("./tags").text
                     tagsForCompare = patternWords.findall(tagsArticles)
