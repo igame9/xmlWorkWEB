@@ -184,6 +184,17 @@ def findXML(request):
         startDate = request.POST.get("firstDate")
         endDate = request.POST.get("secondDate")
         tags = request.POST.get("tags")
+        category = request.POST.get("category")
+
+        if category != "":
+            for root, dirs, files in os.walk("xmlWEBApp/xml"):
+                for filename in files:
+                    myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
+                    categoryInFile = myDoc.find("./category").text
+                    if str(categoryInFile) == str(category):
+                        listSearchFiles.append(str(filename))
+        else:
+            pass
 
         if tags != "":
             for root, dirs, files in os.walk("xmlWEBApp/xml"):
