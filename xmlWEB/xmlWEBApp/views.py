@@ -172,6 +172,12 @@ def findXML(request):
 
         startDate = request.POST.get("firstDate")
         endDate = request.POST.get("secondDate")
+        tags = request.POST.get("tags")
+
+        patternWords = re.compile("([А-Яа-я]+)")
+        enteredTags = patternWords.findall(tags)
+        flagMatchTag = 0
+        print(enteredTags)
         if endDate == "":
             endDate = startDate
         if startDate == "":
@@ -194,11 +200,19 @@ def findXML(request):
                 myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
                 dateAndTime = myDoc.find("./DateAndTime").text
                 onlyDate = datePattern.findall(dateAndTime)
+                tagsArticles = myDoc.find("./tags").text
+                tagsForCompare = patternWords.findall(tagsArticles)
+                for tag in enteredTags:
+                    for cmpTag in tagsForCompare:
+                        if tag == cmpTag:
+                            flagMatchTag = 1
+                            print("Равно")
+                            listSearchFiles.append(str(filename))
                 if onlyDate:
                     day, month, year = str(onlyDate).replace("[", "").replace("]", "").replace("'", "").split(".")
                     dateToDate = date(int(year), int(month), int(day))
 
-                    if examplePattern.fullmatch(filename) and convertedStartDate <= dateToDate <= convertedEndDate:
+                    if examplePattern.match(filename) and convertedStartDate <= dateToDate <= convertedEndDate:
                         listSearchFiles.append(str(filename))
 
         # print(convertedStartDate)
