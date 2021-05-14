@@ -24,7 +24,6 @@ def index(request):
     if request.method == "GET":
         listWithXml = []
         categoryList = []
-        patternWords = re.compile("([А-Яа-я]+)")
         for root, dirs, files in os.walk("xmlWEBApp/xml"):
             for filename in files:
                 myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
@@ -193,6 +192,8 @@ def findXML(request):
                     categoryInFile = myDoc.find("./category").text
                     if str(categoryInFile) == str(category):
                         listSearchFiles.append(str(filename))
+                        print(listSearchFiles)
+
         else:
             pass
 
@@ -216,6 +217,7 @@ def findXML(request):
                 for filename in files:
                     if examplePattern.match(filename):
                         listSearchFiles.append(str(filename))
+
         else:
             pass
 
@@ -241,11 +243,25 @@ def findXML(request):
                         dateToDate = date(int(year), int(month), int(day))
                         if convertedStartDate <= dateToDate <= convertedEndDate:
                             listSearchFiles.append(str(filename))
+
         else:
             pass
 
         listSearchFiles = list(set(listSearchFiles))
         request.session['data'] = listSearchFiles
+
+        categoryList = []
+        for root, dirs, files in os.walk("xmlWEBApp/xml"):
+            for filename in files:
+                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
+                categoryArticles = myDoc.find("./category").text
+                categoryList.append(categoryArticles)
+            # print(",".join(tagsList))
+        stringTags = ",".join(categoryList)
+        patternWords = re.compile("([а-яА-Я0-9_ ]+)")
+        readyTags = set(patternWords.findall(stringTags))
+        request.session['tagsReady'] = list(readyTags)
+
         paginator = Paginator(listSearchFiles, 15)
         page = request.GET.get('page')
         try:
@@ -256,7 +272,8 @@ def findXML(request):
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             xmlPag = paginator.page(paginator.num_pages)
-        return render(request, "index.html", {"xmlPag": xmlPag})
+        return render(request, "index.html", {"xmlPag": xmlPag,
+                                              "readyTags": request.session['tagsReady']})
 
     if request.method == "GET":
         paginator = Paginator(request.session['data'], 15)
@@ -269,4 +286,5 @@ def findXML(request):
         except EmptyPage:
             # If page is out of range (e.g. 9999), deliver last page of results.
             xmlPag = paginator.page(paginator.num_pages)
-        return render(request, "index.html", {"xmlPag": xmlPag})
+        return render(request, "index.html", {"xmlPag": xmlPag,
+                                              "readyTags": request.session['tagsReady']})
