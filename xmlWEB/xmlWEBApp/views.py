@@ -313,9 +313,15 @@ def findXML(request):
             for filename in listSearchFiles:
                 myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
                 views = myDoc.find("./views").text
-                dictView.setdefault(filename, views)
+                try:
+                    dictView.setdefault(filename, int(views))
+                except ValueError:
+                    pass
             sortedDict = sorted(dictView.items(), key=lambda x: x[1])
-            print(sortedDict)
+            listSearchFiles.clear()
+            for key, value in dict(sortedDict).items():
+                listSearchFiles.append(key)
+            request.session['data'] = listSearchFiles
 
         categoryList = []
         for root, dirs, files in os.walk("xmlWEBApp/xml"):
