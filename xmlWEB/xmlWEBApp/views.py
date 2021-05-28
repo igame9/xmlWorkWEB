@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from lxml import etree
 import re
-from datetime import date
+from datetime import date, datetime
 
 
 def get_current_path(request):
@@ -184,6 +184,19 @@ def findXML(request):
         endDate = request.POST.get("secondDate")
         tags = request.POST.get("tags")
         category = request.POST.get("category")
+        sortNameValue = request.POST.get("nameSort")
+        sortDateValue = request.POST.get("dateSort")
+        # print(sortDateValue)
+        # print(sortNameValue)
+        if sortNameValue == "nameSort":
+            sortName = True
+        else:
+            sortName = False
+
+        if sortDateValue == "dateSort":
+            dateSort = True
+        else:
+            dateSort = False
 
         if category != "":
             for root, dirs, files in os.walk("xmlWEBApp/xml"):
@@ -192,7 +205,7 @@ def findXML(request):
                     categoryInFile = myDoc.find("./category").text
                     if str(categoryInFile) == str(category):
                         listSearchFiles.append(str(filename))
-                        print(listSearchFiles)
+                        # print(listSearchFiles)
 
         else:
             pass
@@ -249,6 +262,27 @@ def findXML(request):
 
         listSearchFiles = list(set(listSearchFiles))
         request.session['data'] = listSearchFiles
+
+        if sortName:
+            listSearchFiles.sort()
+            request.session['data'] = listSearchFiles
+
+        if dateSort:
+            dictDate = dict()
+            datePattern = re.compile(r"(\d*\.\d*\.\d*)")
+            for filename in listSearchFiles:
+                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
+                dateAndTime = myDoc.find("./DateAndTime").text
+                onlyDate = str(datePattern.findall(dateAndTime)).replace("'", "").replace("[", "").replace("]", "")
+                day, month, year = str(onlyDate).split(".")
+                dateToDate = date(int(year), int(month), int(day))
+                dictDate.setdefault(filename, dateToDate)
+            listSearchFiles.clear()
+            sortedDict = sorted(dictDate.items(), key=lambda x: x[1])
+            for key, value in dict(sortedDict).items():
+                listSearchFiles.append(key)
+            request.session['data'] = listSearchFiles
+            # print(sortedDict)
 
         categoryList = []
         for root, dirs, files in os.walk("xmlWEBApp/xml"):
