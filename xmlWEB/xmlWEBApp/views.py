@@ -119,11 +119,31 @@ def newXML(request):
         view = jsonData["views"]
         text = jsonData["text"]
         tags = jsonData["tags"]
+        correct = 0
+
         if nameFile == "" or category == "" or title == "" or dateTime == "" \
                 or view == "" or text == "" or tags == "":
             # messages.warning(request, "Требуется заполнить все данные")
             return HttpResponse(json.dumps("Необходимо  заполнить все данные"))
         else:
+            correct = correct + 1
+
+        try:
+            int(view)
+        except ValueError:
+            return HttpResponse(json.dumps("Некорректное количество просмотров"))
+        else:
+            correct = correct + 1
+
+        try:
+            day, month, year = str(dateTime).replace("[", "").replace("]", "").replace("'", "").split(".")
+            checkDate = date(int(year), int(month), int(day))
+        except ValueError:
+            return HttpResponse(json.dumps("Некорректная дата"))
+        else:
+            correct = correct + 1
+
+        if correct == 3:
             xmlData = etree.Element("doc")
             # sourceXmlData = etree.SubElement(xmlData, "source")
             # sourceXmlData.text = etree.CDATA(driver.current_url) ; запись источника данных
@@ -184,19 +204,23 @@ def findXML(request):
         endDate = request.POST.get("secondDate")
         tags = request.POST.get("tags")
         category = request.POST.get("category")
-        sortNameValue = request.POST.get("nameSort")
-        sortDateValue = request.POST.get("dateSort")
-        # print(sortDateValue)
-        # print(sortNameValue)
-        if sortNameValue == "nameSort":
+
+        sortValue = request.POST.get("sort")
+
+        if sortValue == "nameSort":
             sortName = True
         else:
             sortName = False
 
-        if sortDateValue == "dateSort":
+        if sortValue == "dateSort":
             dateSort = True
         else:
             dateSort = False
+
+        if sortValue == "viewSort":
+            viewSort = True
+        else:
+            viewSort = False
 
         if category != "":
             for root, dirs, files in os.walk("xmlWEBApp/xml"):
@@ -282,7 +306,16 @@ def findXML(request):
             for key, value in dict(sortedDict).items():
                 listSearchFiles.append(key)
             request.session['data'] = listSearchFiles
-            # print(sortedDict)
+            print(sortedDict)
+
+        if viewSort:
+            dictView = dict()
+            for filename in listSearchFiles:
+                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
+                views = myDoc.find("./views").text
+                dictView.setdefault(filename, views)
+            sortedDict = sorted(dictView.items(), key=lambda x: x[1])
+            print(sortedDict)
 
         categoryList = []
         for root, dirs, files in os.walk("xmlWEBApp/xml"):
