@@ -339,6 +339,12 @@ def findXML(request):
             # if "eq" in listEq and examplePattern.match(file):
             #     listAnd.append(file)
 
+            # find category
+            categoryInFile = myDoc.find("./category").text
+            if str(category) != "":
+                if str(categoryInFile) != str(category):
+                    countNot = countNot + 1
+
             # .........
             # check for have countNot or not
             # print(countNot)
