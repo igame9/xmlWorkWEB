@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from lxml import etree
 import re
-from datetime import date, datetime
+from datetime import date
 
 
 def get_current_path(request):
