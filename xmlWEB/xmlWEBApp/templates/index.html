@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <html>
+{% block javascript %}
+<script type="text/javascript">
+
+
+</script>
+{% endblock %}
+
 <style>
    .likeAButton{
         border: 1px solid #333;
@@ -49,7 +56,7 @@
       <div class="row">
         <div class="col-md-12">
           <h1>Сервис для работы с xml файлами</h1>
-            <input onclick="document.location = '/newXML'" type="button" value="Добавить новую статью">
+            <input onclick="document.location = '/newXML/create'" type="button" value="Добавить новую статью">
         </div>
       </div>
     </div>
@@ -57,7 +64,7 @@
   <div class="py-5">
     <div class="container">
 <!--        <label for="searchText">Имя</label>-->
-        <form method="post" action="/findXML/">
+        <form method="post" action="/findXML/find">
                 {% csrf_token %}
             <p><input type="text" placeholder="Имя статьи" id="searchText" name="reg"></p>
             <p><input type="date" placeholder="Начальная дата" name="firstDate" id="startDate"> - <input type="date" name="secondDate"  id="endDate"></p>

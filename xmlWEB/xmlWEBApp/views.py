@@ -6,7 +6,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from lxml import etree
 import re
 from datetime import date
@@ -20,7 +20,7 @@ def get_current_path(request):
 
 # Create your views here.
 @csrf_exempt
-def index(request):
+def index(request):  # заполнение индексной страницы
     if request.method == "GET":
         listWithXml = []
         categoryList = []
@@ -29,11 +29,11 @@ def index(request):
                 myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
                 categoryArticles = myDoc.find("./category").text
                 categoryList.append(categoryArticles)
-                listWithXml.append(filename)
+                listWithXml.append(str(filename).rstrip(".xml"))
         # print(",".join(tagsList))
         stringTags = ",".join(categoryList)
         patternWords = re.compile("([а-яА-Я0-9_ ]+)")
-        readyTags = set(patternWords.findall(stringTags))
+        readyTags = set(patternWords.findall(stringTags))  # все существующие теги
 
         paginator = Paginator(listWithXml, 15)
         page = request.GET.get('page')
@@ -50,7 +50,7 @@ def index(request):
 
 
 @csrf_exempt
-def xml(request, any):
+def xml(request, any):  # any - name of file, открытие xml файла
     # file = open("xmlWEBApp/xml/" + str(any) + ".xml", "r", encoding="utf-8")
     try:
         myDoc = etree.parse("xmlWEBApp/xml/" + str(any) + ".xml")
@@ -70,10 +70,11 @@ def xml(request, any):
                        "views": views,
                        "text": text,
                        "tags": tags})
-    except (FileNotFoundError, OSError):
+    except (FileNotFoundError, OSError):  # несуществующий файл и его чтение
         return HttpResponseRedirect(reverse('xmlWEBApp:_indexPage_'))
 
 
+@csrf_protect
 def saveChange(request):
     if request.method == 'POST' and request.is_ajax():
         data = request.body.decode('utf-8')
@@ -98,6 +99,7 @@ def saveChange(request):
         return HttpResponse(200)
 
 
+@csrf_protect
 def deleteFile(request):
     if request.method == 'DELETE' and request.is_ajax():
         data = request.body.decode('utf-8')
@@ -108,6 +110,7 @@ def deleteFile(request):
         return HttpResponse(200)
 
 
+@csrf_protect
 def newXML(request):
     if request.method == 'POST' and request.is_ajax():
         data = request.body.decode('utf-8')
@@ -116,22 +119,14 @@ def newXML(request):
         category = jsonData["category"]
         title = jsonData["title"]
         dateTime = jsonData["dateAndTime"]
-        view = jsonData["views"]
         text = jsonData["text"]
         tags = jsonData["tags"]
         correct = 0
 
         if nameFile == "" or category == "" or title == "" or dateTime == "" \
-                or view == "" or text == "" or tags == "":
+                or text == "" or tags == "":
             # messages.warning(request, "Требуется заполнить все данные")
             return HttpResponse(json.dumps("Необходимо  заполнить все данные"))
-        else:
-            correct = correct + 1
-
-        try:
-            int(view)
-        except ValueError:
-            return HttpResponse(json.dumps("Некорректное количество просмотров"))
         else:
             correct = correct + 1
 
@@ -143,7 +138,7 @@ def newXML(request):
         else:
             correct = correct + 1
 
-        if correct == 3:
+        if correct == 2:
             xmlData = etree.Element("doc")
             # sourceXmlData = etree.SubElement(xmlData, "source")
             # sourceXmlData.text = etree.CDATA(driver.current_url) ; запись источника данных
@@ -181,7 +176,7 @@ def newXML(request):
             categoryXmlData.text = category
             titleXmlData.text = str(title)
             dateAndTime.text = str(dateTime)
-            views.text = str(view)
+            views.text = str("Статья создана вручную")
             textXmlData.text = str(text)
             tagsXmlData.text = str(tags)
             nameFileXML = str(nameFile)
@@ -195,6 +190,7 @@ def newXML(request):
         return render(request, "newXML.html")
 
 
+@csrf_protect
 def findXML(request):
     if request.method == 'POST':
         listSearchFiles = []

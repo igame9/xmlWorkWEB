@@ -4,7 +4,7 @@
 <script type="text/javascript">
   function createXML() {
 
-    const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+   const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     var xhr = new XMLHttpRequest();
     xhr.onload = (e) => {
       var data = JSON.parse(e.target.response);
@@ -13,14 +13,11 @@
           document.getElementById("category").textContent = "";
           document.getElementById("title").textContent = "";
           document.getElementById("dateAndTime").textContent = "";
-          document.getElementById("dateAndTime").textContent = "";
-          document.getElementById("views").textContent = "";
           document.getElementById("text").textContent = "";
           document.getElementById("tags").textContent = "";
-          document.getElementById("nameFile").textContent = "";
       }
     };
-    xhr.open("POST", "/newXML/", true);
+    xhr.open("POST", "/newXML/create", true);
     xhr.setRequestHeader("X-CSRFToken", csrftoken);
     xhr.setRequestHeader("Content-type", "application/json");
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
@@ -28,16 +25,14 @@
     var category = document.getElementById("category").textContent;
     var title = document.getElementById("title").textContent;
     var dateAndTime = document.getElementById("dateAndTime").textContent;
-    var views = document.getElementById("views").textContent;
     var text = document.getElementById("text").textContent;
     var tags = document.getElementById("tags").textContent;
-    var nameFile = document.getElementById("nameFile").textContent;
+    var nameFile = document.getElementById("title").textContent;
 
     data = {
       "category":category,
       "title":title,
       "dateAndTime":dateAndTime,
-      "views":views,
       "text":text,
       "tags":tags,
       "nameFile":nameFile
@@ -99,20 +94,12 @@
                   <td contenteditable id="dateAndTime"></td>
                 </tr>
                 <tr>
-                  <td>Количество просмотров на момент сбора</td>
-                  <td contenteditable id="views"></td>
-                </tr>
-                <tr>
                   <td>Текст статьи</td>
                   <td contenteditable id="text"></td>
                 </tr>
                  <tr>
                   <td>Теги статьи</td>
                   <td contenteditable id="tags"></td>
-                </tr>
-                 <tr>
-                  <td>Имя файла</td>
-                  <td contenteditable id="nameFile"></td>
                 </tr>
               </tbody>
             </table>
