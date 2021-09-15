@@ -224,7 +224,7 @@ def findXML(request):
                     myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
                     categoryInFile = myDoc.find("./category").text
                     if str(categoryInFile) == str(category):
-                        listSearchFiles.append(str(filename))
+                        listSearchFiles.append(str(filename.rstrip(".xml")))
                         # print(listSearchFiles)
 
         else:
@@ -242,14 +242,14 @@ def findXML(request):
                         for cmpTag in tagsForCompare:
                             if tag == cmpTag:
                                 # print("Равно")
-                                listSearchFiles.append(str(filename))
+                                listSearchFiles.append(str(filename.rstrip(".xml")))
 
         if data != "":
             examplePattern = re.compile("(" + str(data) + ".+)")  # ("(.*" + "[" + str(data) + "]" + "+.*)")
             for root, dirs, files in os.walk("xmlWEBApp/xml"):
                 for filename in files:
                     if examplePattern.match(filename):
-                        listSearchFiles.append(str(filename))
+                        listSearchFiles.append(str(filename.rstrip(".xml")))
 
         else:
             pass
@@ -275,7 +275,7 @@ def findXML(request):
                         day, month, year = str(onlyDate).replace("[", "").replace("]", "").replace("'", "").split(".")
                         dateToDate = date(int(year), int(month), int(day))
                         if convertedStartDate <= dateToDate <= convertedEndDate:
-                            listSearchFiles.append(str(filename))
+                            listSearchFiles.append(str(filename.rstrip(".xml")))
 
         else:
             pass
@@ -285,7 +285,7 @@ def findXML(request):
 
         for file in listSearchFiles:  # and instead or
             countNot = 0
-            myDoc = etree.parse("xmlWEBApp/xml/" + str(file))
+            myDoc = etree.parse("xmlWEBApp/xml/" + str(file) + ".xml")
             # find date
             if startDate != "" or endDate != "":
                 if endDate == "":
@@ -346,10 +346,10 @@ def findXML(request):
             # print(countNot)
             if enteredTags:
                 if countNot == 0 and countHaveTag > 0:
-                    listAnd.append(file)
+                    listAnd.append(str(file.rstrip(".xml")))
             else:
                 if countNot == 0:
-                    listAnd.append(file)
+                    listAnd.append(str(file.rstrip(".xml")))
 
         # print(listAnd)
         request.session['data'] = listAnd
@@ -363,7 +363,7 @@ def findXML(request):
             dictDate = dict()
             datePattern = re.compile(r"(\d*\.\d*\.\d*)")
             for filename in listAnd:
-                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
+                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename) + ".xml")
                 dateAndTime = myDoc.find("./DateAndTime").text
                 onlyDate = str(datePattern.findall(dateAndTime)).replace("'", "").replace("[", "").replace("]", "")
                 day, month, year = str(onlyDate).split(".")
@@ -371,15 +371,15 @@ def findXML(request):
                 dictDate.setdefault(filename, dateToDate)
             listAnd.clear()
             sortedDict = sorted(dictDate.items(), key=lambda x: x[1])
-            for key, value in dict(sortedDict).items():
+            for key, value in dict(sortedDict).items():  # key - имя файла , value - дата, в список идкет имя без .xml
                 listAnd.append(key)
             request.session['data'] = listAnd
-            print(sortedDict)
+            # print(sortedDict)
 
         if viewSort:
             dictView = dict()
             for filename in listAnd:
-                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
+                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename) + ".xml")
                 views = myDoc.find("./views").text
                 try:
                     dictView.setdefault(filename, int(views))

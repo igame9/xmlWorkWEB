@@ -10,5 +10,5 @@ urlpatterns = [
     path('deleteFile/delete', views.deleteFile, name="_deleteXML_"),
     path('newXML/create', views.newXML, name="_newXML_"),
     path('findXML/find', views.findXML, name="_findXML_"),
-    path('findXML/<str:any>.xml/', views.xml, name="_findXML_"),
+    path('findXML/<str:any>/', views.xml, name="_findXML_"),
 ]
