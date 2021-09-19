@@ -10,32 +10,30 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from lxml import etree
 import re
 from datetime import date
-
-
-def get_current_path(request):
-    return {
-        'current_path': request.get_full_path()
-    }
+from . import functions
 
 
 # Create your views here.
 @csrf_exempt
 def index(request):  # заполнение индексной страницы
     if request.method == "GET":
-        listWithXml = []
+        listWithXml = {}
         categoryList = []
+        paginatorDict = tuple()
         for root, dirs, files in os.walk("xmlWEBApp/xml"):
             for filename in files:
                 myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
                 categoryArticles = myDoc.find("./category").text
+                title = myDoc.find("./title").text
                 categoryList.append(categoryArticles)
-                listWithXml.append(str(filename).rstrip(".xml"))
-        # print(",".join(tagsList))
+                listWithXml.setdefault(str(filename).rstrip(".xml"), title)  # print(",".join(tagsList))
+                paginatorDict = tuple(listWithXml.items())
+
         stringTags = ",".join(categoryList)
         patternWords = re.compile("([а-яА-Я0-9_ ]+)")
         readyTags = set(patternWords.findall(stringTags))  # все существующие теги
 
-        paginator = Paginator(listWithXml, 15)
+        paginator = Paginator(paginatorDict, 15)
         page = request.GET.get('page')
         try:
             xmlPag = paginator.page(page)
@@ -193,14 +191,12 @@ def newXML(request):
 @csrf_protect
 def findXML(request):
     if request.method == 'POST':
-        listSearchFiles = []
-        data = request.POST.get("reg")  # nameFile
 
+        data = request.POST.get("reg")  # nameFile
         startDate = request.POST.get("firstDate")
         endDate = request.POST.get("secondDate")
         tags = request.POST.get("tags")
         category = request.POST.get("category")
-
         sortValue = request.POST.get("sort")
 
         if sortValue == "nameSort":
@@ -218,192 +214,17 @@ def findXML(request):
         else:
             viewSort = False
 
-        if category != "":
-            for root, dirs, files in os.walk("xmlWEBApp/xml"):
-                for filename in files:
-                    myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
-                    categoryInFile = myDoc.find("./category").text
-                    if str(categoryInFile) == str(category):
-                        listSearchFiles.append(str(filename.rstrip(".xml")))
-                        # print(listSearchFiles)
+        listSearchFiles = functions.getListSearchFiles(category, tags, data, startDate, endDate)
+        listAnd = functions.getListAnd(listSearchFiles, startDate, endDate, data, category, tags)
+        request.session['data'] = listAnd # на случай, если не было сортировки, чтобы сессионная переменная не была
+        # пустой
 
-        else:
-            pass
+        functions.makeSort(sortName, dateSort, listAnd, viewSort, request)
 
-        if tags != "":
-            for root, dirs, files in os.walk("xmlWEBApp/xml"):
-                for filename in files:
-                    myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
-                    patternWords = re.compile("([А-Яа-я]+)")  # ([а-яА-Я0-9_ ]+)  ([А-Яа-я]+)
-                    enteredTags = patternWords.findall(tags)
-                    tagsArticles = myDoc.find("./tags").text
-                    tagsForCompare = patternWords.findall(tagsArticles)
-                    for tag in enteredTags:
-                        for cmpTag in tagsForCompare:
-                            if tag == cmpTag:
-                                # print("Равно")
-                                listSearchFiles.append(str(filename.rstrip(".xml")))
+        request.session['tagsReady'] = functions.getCategory()  # Список категорий
 
-        if data != "":
-            examplePattern = re.compile("(" + str(data) + ".+)")  # ("(.*" + "[" + str(data) + "]" + "+.*)")
-            for root, dirs, files in os.walk("xmlWEBApp/xml"):
-                for filename in files:
-                    if examplePattern.match(filename):
-                        listSearchFiles.append(str(filename.rstrip(".xml")))
-
-        else:
-            pass
-
-        if startDate != "" or endDate != "":
-            if endDate == "":
-                endDate = startDate
-            if startDate == "":
-                startDate = endDate
-
-            datePattern = re.compile(r"(\d*\.\d*\.\d*)")
-            yearStart, mothStart, dayStart = str(startDate).split("-")
-            convertedStartDate = date(int(yearStart), int(mothStart), int(dayStart))
-            yearEnd, mothEnd, dayEnd = str(endDate).split("-")
-            convertedEndDate = date(int(yearEnd), int(mothEnd), int(dayEnd))
-            for root, dirs, files in os.walk("xmlWEBApp/xml"):
-                for filename in files:
-                    myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
-                    dateAndTime = myDoc.find("./DateAndTime").text
-                    onlyDate = datePattern.findall(dateAndTime)
-
-                    if onlyDate:
-                        day, month, year = str(onlyDate).replace("[", "").replace("]", "").replace("'", "").split(".")
-                        dateToDate = date(int(year), int(month), int(day))
-                        if convertedStartDate <= dateToDate <= convertedEndDate:
-                            listSearchFiles.append(str(filename.rstrip(".xml")))
-
-        else:
-            pass
-
-        listSearchFiles = list(set(listSearchFiles))
-        listAnd = []
-
-        for file in listSearchFiles:  # and instead or
-            countNot = 0
-            myDoc = etree.parse("xmlWEBApp/xml/" + str(file) + ".xml")
-            # find date
-            if startDate != "" or endDate != "":
-                if endDate == "":
-                    endDate = startDate
-                if startDate == "":
-                    startDate = endDate
-                yearStart, mothStart, dayStart = str(startDate).split("-")
-                convertedStartDate = date(int(yearStart), int(mothStart), int(dayStart))
-                yearEnd, mothEnd, dayEnd = str(endDate).split("-")
-                convertedEndDate = date(int(yearEnd), int(mothEnd), int(dayEnd))
-
-                datePattern = re.compile(r"(\d*\.\d*\.\d*)")
-                dateAndTime = myDoc.find("./DateAndTime").text
-                onlyDate = datePattern.findall(dateAndTime)
-                if onlyDate:
-                    day, month, year = str(onlyDate).replace("[", "").replace("]", "").replace("'", "").split(".")
-                    dateToDate = date(int(year), int(month), int(day))
-                    if not (convertedStartDate <= dateToDate <= convertedEndDate):
-                        countNot = countNot + 1
-
-            else:
-                pass
-            # ......
-            # find name
-            examplePattern = re.compile("(" + str(data) + ".+)")
-            if not examplePattern.match(file):
-                countNot = countNot + 1
-
-            # ........
-            # find tags
-            # listEq = []
-            finish = 0
-            countHaveTag = 0  # теги, которые есть в файле и были введены
-            countNoTag = 0
-            patternWords = re.compile("([А-Яа-я]+)")
-            enteredTags = patternWords.findall(tags)
-            tagsArticles = myDoc.find("./tags").text
-            tagsForCompare = patternWords.findall(tagsArticles)
-            for tag in enteredTags:
-                for cmpTag in tagsForCompare:  # !!!
-                    #  print(str(file) + " Файл" + str(tag) + " Тег" + str(cmpTag) + " cmpTag")
-                    if tag == cmpTag:
-                        countHaveTag = countHaveTag + 1
-                    else:
-                        countNoTag = countNoTag + 1
-
-            # if "eq" in listEq and examplePattern.match(file):
-            #     listAnd.append(file)
-
-            # find category
-            categoryInFile = myDoc.find("./category").text
-            if str(category) != "":
-                if str(categoryInFile) != str(category):
-                    countNot = countNot + 1
-
-            # .........
-            # check for have countNot or not
-            # print(countNot)
-            if enteredTags:
-                if countNot == 0 and countHaveTag > 0:
-                    listAnd.append(str(file.rstrip(".xml")))
-            else:
-                if countNot == 0:
-                    listAnd.append(str(file.rstrip(".xml")))
-
-        # print(listAnd)
-        request.session['data'] = listAnd
-
-        # startSort
-        if sortName:
-            listAnd.sort()
-            request.session['data'] = listAnd
-
-        if dateSort:
-            dictDate = dict()
-            datePattern = re.compile(r"(\d*\.\d*\.\d*)")
-            for filename in listAnd:
-                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename) + ".xml")
-                dateAndTime = myDoc.find("./DateAndTime").text
-                onlyDate = str(datePattern.findall(dateAndTime)).replace("'", "").replace("[", "").replace("]", "")
-                day, month, year = str(onlyDate).split(".")
-                dateToDate = date(int(year), int(month), int(day))
-                dictDate.setdefault(filename, dateToDate)
-            listAnd.clear()
-            sortedDict = sorted(dictDate.items(), key=lambda x: x[1])
-            for key, value in dict(sortedDict).items():  # key - имя файла , value - дата, в список идкет имя без .xml
-                listAnd.append(key)
-            request.session['data'] = listAnd
-            # print(sortedDict)
-
-        if viewSort:
-            dictView = dict()
-            for filename in listAnd:
-                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename) + ".xml")
-                views = myDoc.find("./views").text
-                try:
-                    dictView.setdefault(filename, int(views))
-                except ValueError:
-                    pass
-            sortedDict = sorted(dictView.items(), key=lambda x: x[1])
-            listAnd.clear()
-            for key, value in dict(sortedDict).items():
-                listAnd.append(key)
-            request.session['data'] = listAnd
-
-        categoryList = []
-        for root, dirs, files in os.walk("xmlWEBApp/xml"):
-            for filename in files:
-                myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
-                categoryArticles = myDoc.find("./category").text
-                categoryList.append(categoryArticles)
-            # print(",".join(tagsList))
-        stringTags = ",".join(categoryList)
-        patternWords = re.compile("([а-яА-Я0-9_ ]+)")
-        readyTags = set(patternWords.findall(stringTags))
-        request.session['tagsReady'] = list(readyTags)
-
-        paginator = Paginator(listAnd, 15)
+        paginatorDict = tuple(request.session['data'].items())
+        paginator = Paginator(paginatorDict, 15)
         page = request.GET.get('page')
         try:
             xmlPag = paginator.page(page)
@@ -417,7 +238,8 @@ def findXML(request):
                                               "readyTags": request.session['tagsReady']})
 
     if request.method == "GET":
-        paginator = Paginator(request.session['data'], 15)
+        paginatorDict = tuple(request.session['data'].items())
+        paginator = Paginator(paginatorDict, 15)
         page = request.GET.get('page')
         try:
             xmlPag = paginator.page(page)
