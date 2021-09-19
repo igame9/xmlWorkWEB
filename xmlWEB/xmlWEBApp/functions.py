@@ -188,7 +188,8 @@ def makeSort(sortName, dateSort, listAnd, viewSort, request):
         for filename in listAnd:
             myDoc = etree.parse("xmlWEBApp/xml/" + str(filename) + ".xml")
             views = myDoc.find("./views").text
-            if views == "Статья создана вручную":  # При статье созданной вручную
+            if views == "Статья создана вручную":  # При статье созданной вручную, отсюда при созданном вручную не
+                # попадало в дальнейший словарь
                 views = 0
             try:
                 dictView.setdefault(filename, int(views))
