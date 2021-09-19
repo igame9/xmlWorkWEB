@@ -216,9 +216,8 @@ def findXML(request):
 
         listSearchFiles = functions.getListSearchFiles(category, tags, data, startDate, endDate)
         listAnd = functions.getListAnd(listSearchFiles, startDate, endDate, data, category, tags)
-        request.session['data'] = listAnd # на случай, если не было сортировки, чтобы сессионная переменная не была
-        # пустой
-
+        request.session['data'] = listAnd  # на случай, если не было сортировки, чтобы сессионная переменная не была
+        # пустой Записываю либо после сортировки, либо при окночательном заполнении listAnd
         functions.makeSort(sortName, dateSort, listAnd, viewSort, request)
 
         request.session['tagsReady'] = functions.getCategory()  # Список категорий
