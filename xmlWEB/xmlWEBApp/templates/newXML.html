@@ -2,8 +2,17 @@
 <html>
 {% block javascript %}
 <script type="text/javascript">
-  function createXML() {
 
+  function checkData(){
+    for (var i = 0; i < arguments.length; i++) {
+      if(arguments[i] === ""){
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function createXML() {
    const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
     var xhr = new XMLHttpRequest();
     xhr.onload = (e) => {
@@ -28,6 +37,11 @@
     var text = document.getElementById("text").textContent;
     var tags = document.getElementById("tags").textContent;
     var nameFile = document.getElementById("title").textContent;
+
+    if (checkData(category, title, dateAndTime, text, tags, nameFile) === false){
+      document.getElementById("message").textContent = "Необходимо заполнить данные";
+      return false;
+    }
 
     data = {
       "category":category,
