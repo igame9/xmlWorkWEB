@@ -15,5 +15,7 @@ def nlp(request):
         tokenWithoutNumbers = functionsNLP.deleteNumbers(tokenWithoutStop)
         tokenWithoutSpaces = functionsNLP.deleteSpaces(tokenWithoutNumbers)
         deleteRepeatWords = functionsNLP.deleteRepeatWords(tokenWithoutSpaces)
-        print(deleteRepeatWords)
+        deleteNames = functionsNLP.deleteNames(deleteRepeatWords)
+        getStem = functionsNLP.getStem(deleteNames)
+        print(getStem)
     return HttpResponse("Обучение")
