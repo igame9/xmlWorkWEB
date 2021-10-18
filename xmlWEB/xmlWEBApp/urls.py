@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views  # view из корня
+from . import viewsLearn
 
 app_name = 'xmlWEBApp'
 
@@ -11,4 +12,5 @@ urlpatterns = [
     path('newXML/create', views.newXML, name="_newXML_"),
     path('findXML/find', views.findXML, name="_findXML_"),
     path('findXML/<str:any>/', views.xml, name="_findXML_"),
+    path('learn/nlp', viewsLearn.nlp, name="_learning_"),
 ]

@@ -1,4 +1,4 @@
-# Функции для работы с приложением
+# Функции для работы с views
 import os
 import re
 from datetime import date
