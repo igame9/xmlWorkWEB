@@ -4,6 +4,7 @@ from nltk.corpus import stopwords
 import re
 from natasha import NamesExtractor, MorphVocab
 from nltk.stem.snowball import SnowballStemmer
+from sklearn.feature_extraction.text import CountVectorizer
 
 
 def getTokenize(text):
@@ -70,8 +71,34 @@ def deleteNames(text):
 
 
 def getStem(text):
-    steanTokens = []
+    stemTokens = []
     stemmer = SnowballStemmer("russian")
     for word in text:
-        steanTokens.append(stemmer.stem(word))
-    return steanTokens
+        stemTokens.append(stemmer.stem(word))
+    return stemTokens
+
+
+def generateBow(text):
+    listBow = []
+    stringBow = " ".join(text)
+    listBow.append(stringBow)
+
+    vectorizer = CountVectorizer()
+    X = vectorizer.fit_transform(listBow)
+    xArray = X.toarray()
+    # print(xArray)
+    # print(vectorizer.get_feature_names_out())
+    return xArray
+
+
+def vectorize(text):
+    textLoweCase = str(text).lower()
+    tokenize = getTokenize(textLoweCase)
+    tokenWithoutStop = removeStopWords(tokenize)
+    tokenWithoutNumbers = deleteNumbers(tokenWithoutStop)
+    tokenWithoutSpaces = deleteSpaces(tokenWithoutNumbers)
+    deleteRepeatWord = deleteRepeatWords(tokenWithoutSpaces)
+    deleteName = deleteNames(deleteRepeatWord)
+    getSt = getStem(deleteName)
+    vectorize = generateBow(getSt)
+    return vectorize

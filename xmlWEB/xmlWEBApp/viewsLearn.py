@@ -1,21 +1,20 @@
 from django.http import HttpResponse
 from lxml import etree
 from . import functionsNLP
+from sklearn.svm import SVC
 
 
 def nlp(request):
     if request.method == "GET":
         # for root, dirs, files in os.walk("xmlWEBApp/xml"):
         #     for filename in files:
-        myDoc = etree.parse("xmlWEBApp/xml/" + "firstThread4.xml")
-        text = myDoc.find("./text").text
-        textLoweCase = str(text).lower()
-        tokenize = functionsNLP.getTokenize(textLoweCase)
-        tokenWithoutStop = functionsNLP.removeStopWords(tokenize)
-        tokenWithoutNumbers = functionsNLP.deleteNumbers(tokenWithoutStop)
-        tokenWithoutSpaces = functionsNLP.deleteSpaces(tokenWithoutNumbers)
-        deleteRepeatWords = functionsNLP.deleteRepeatWords(tokenWithoutSpaces)
-        deleteNames = functionsNLP.deleteNames(deleteRepeatWords)
-        getStem = functionsNLP.getStem(deleteNames)
-        print(getStem)
+        listPolitic = ["firstThread132.xml", "firstThread148.xml", "firstThread139.xml"]
+        listMedicine = ["firstThread133.xml", "firstThread149.xml", "firstThread165.xml", "firstThread189.xml"]
+        listCatastrophe = ["firstThread14.xml", "firstThread159.xml", "firstThread27.xml"]
+        for pol in listPolitic:
+            myDoc = etree.parse("xmlWEBApp/xml/" + str(pol))
+            text = myDoc.find("./text").text
+            vector = functionsNLP.vectorize(text)
+            print(vector)
+
     return HttpResponse("Обучение")
