@@ -1,5 +1,7 @@
 from django.http import HttpResponse
 from lxml import etree
+from sklearn.neighbors import KNeighborsClassifier
+
 from . import functionsNLP
 from sklearn.svm import SVC  # метод опорных векторов
 import numpy as np
@@ -74,9 +76,9 @@ def learnModel(request):
     if request.method == "GET":
         rawData = open("readyCoords.txt")
         dataset = np.loadtxt(rawData, delimiter=",")
-        svmClassifier = SVC()
+        svmClassifier = KNeighborsClassifier()
         svmClassifier.fit(dataset[:, :-1], dataset[:, -1])
-        pickle.dump(svmClassifier, open("model.dat", 'wb'))
+        pickle.dump(svmClassifier, open("modelK.dat", 'wb'))
         return HttpResponse("Обучение")
 
 
@@ -84,14 +86,12 @@ def testLearn(request):
     if request.method == "GET":
         listSize = [349]
         listVectors = []
-        loadedSvmClassifier = pickle.load(open("model.dat", 'rb'))
-        myDoc = etree.parse("xmlWEBApp/xml/" + "firstThread495.xml")
+        loadedSvmClassifier = pickle.load(open("modelK.dat", 'rb'))
+        myDoc = etree.parse("xmlWEBApp/xml/" + "firstThread413.xml")
         text = myDoc.find("./text").text
         vector = functionsNLP.vectorize(text)
         numpyArray = np.array(vector)
         listVectors.append(numpyArray)
         readyVector = functionsNLP.fillZerosVector(listVectors, listSize, 0)
         svmPredict = loadedSvmClassifier.predict(readyVector)
-        print(svmPredict)
-
-        return HttpResponse("Тест")
+        return HttpResponse(svmPredict)
