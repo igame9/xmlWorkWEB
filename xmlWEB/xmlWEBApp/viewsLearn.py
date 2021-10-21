@@ -18,9 +18,12 @@ def nlp(request):
     if request.method == "GET":
         # for root, dirs, files in os.walk("xmlWEBApp/xml"):
         #     for filename in files:
-        listPolitic = ["firstThread132.xml", "firstThread148.xml", "firstThread139.xml"]
-        listMedicine = ["firstThread133.xml", "firstThread149.xml", "firstThread165.xml", "firstThread189.xml"]
-        listCatastrophe = ["firstThread14.xml", "firstThread159.xml", "firstThread27.xml"]
+        listPolitic = ["firstThread132.xml", "firstThread148.xml", "firstThread139.xml", "firstThread219.xml",
+                       "firstThread227.xml"]
+        listMedicine = ["firstThread133.xml", "firstThread149.xml", "firstThread189.xml", "firstThread183.xml",
+                        "firstThread276.xml"]
+        listCatastrophe = ["firstThread14.xml", "firstThread159.xml", "firstThread27.xml", "firstThread31.xml",
+                           "firstThread499.xml"]
         listVectors = []
         sizeVector = []
         generalList = listPolitic + listMedicine + listCatastrophe
@@ -75,3 +78,20 @@ def learnModel(request):
         svmClassifier.fit(dataset[:, :-1], dataset[:, -1])
         pickle.dump(svmClassifier, open("model.dat", 'wb'))
         return HttpResponse("Обучение")
+
+
+def testLearn(request):
+    if request.method == "GET":
+        listSize = [349]
+        listVectors = []
+        loadedSvmClassifier = pickle.load(open("model.dat", 'rb'))
+        myDoc = etree.parse("xmlWEBApp/xml/" + "firstThread495.xml")
+        text = myDoc.find("./text").text
+        vector = functionsNLP.vectorize(text)
+        numpyArray = np.array(vector)
+        listVectors.append(numpyArray)
+        readyVector = functionsNLP.fillZerosVector(listVectors, listSize, 0)
+        svmPredict = loadedSvmClassifier.predict(readyVector)
+        print(svmPredict)
+
+        return HttpResponse("Тест")

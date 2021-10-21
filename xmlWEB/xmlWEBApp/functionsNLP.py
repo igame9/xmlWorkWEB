@@ -118,7 +118,6 @@ def fillZerosVector(numpyArrays, listSize, attribute):
 
 
 def saveReadyVectors(listOfVectors, sizeVector, attr, fileName):
-
     fillZeros = fillZerosVector(listOfVectors, sizeVector, attr)
     file = open(fileName, 'w')
     for fillVector in fillZeros:

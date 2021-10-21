@@ -12,6 +12,7 @@ urlpatterns = [
     path('newXML/create', views.newXML, name="_newXML_"),
     path('findXML/find', views.findXML, name="_findXML_"),
     path('findXML/<str:any>/', views.xml, name="_findXML_"),
-    path('learn/nlp', viewsLearn.nlp, name="_learning_"),
-    path('learn/learnModel', viewsLearn.learnModel, name="_learning_"),
+    path('learn/nlp', viewsLearn.nlp, name="_nlp_"),
+    path('learn/learnModel', viewsLearn.learnModel, name="_learn_"),
+    path('learn/test', viewsLearn.testLearn, name="_test_"),
 ]
