@@ -5,6 +5,7 @@ import re
 from natasha import NamesExtractor, MorphVocab
 from nltk.stem.snowball import SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
+import numpy as np
 
 
 def getTokenize(text):
@@ -100,5 +101,28 @@ def vectorize(text):
     deleteRepeatWord = deleteRepeatWords(tokenWithoutSpaces)
     deleteName = deleteNames(deleteRepeatWord)
     getSt = getStem(deleteName)
-    vectorize = generateBow(getSt)
-    return vectorize
+    vector = generateBow(getSt)
+    return vector
+
+
+def fillZerosVector(numpyArrays, listSize, attribute):
+    fillsVectors = []
+    maxSize = max(listSize)
+    for array in numpyArrays:
+        if np.size(array) != maxSize:
+            while np.size(array) != maxSize:
+                array = np.append(array, 0)
+        array = np.append(array, attribute)
+        fillsVectors.append(array)
+    return fillsVectors
+
+
+def saveReadyVectors(listOfVectors, sizeVector, attr, fileName):
+
+    fillZeros = fillZerosVector(listOfVectors, sizeVector, attr)
+    file = open(fileName, 'w')
+    for fillVector in fillZeros:
+        listVector = list(fillVector.astype("str"))
+        StringVector = ",".join(listVector)
+        file.write(StringVector + "\n")
+    file.close()

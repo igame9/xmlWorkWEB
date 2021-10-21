@@ -3,5 +3,7 @@ Django~=3.2.7
 lxml==4.6.3
 pytz==2021.1
 sqlparse==0.4.1
-
 nltk~=3.6.5
+numpy~=1.21.2
+scikit-learn~=1.0
+natasha~=1.4.0
