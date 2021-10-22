@@ -215,4 +215,10 @@ def getCategory():
     stringTags = ",".join(categoryList)
     patternWords = re.compile("([а-яА-Я0-9_ ]+)")
     readyTags = set(patternWords.findall(stringTags))
-    return list(readyTags)
+    listTags = []
+    for tag in readyTags:
+        if tag == ' ':
+            pass
+        else:
+            listTags.append(tag)
+    return list(listTags)

@@ -95,3 +95,4 @@ def testLearn(request):
         readyVector = functionsNLP.fillZerosVector(listVectors, listSize, 0)
         svmPredict = loadedSvmClassifier.predict(readyVector)
         return HttpResponse(svmPredict)
+

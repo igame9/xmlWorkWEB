@@ -29,9 +29,7 @@ def index(request):  # заполнение индексной страницы
                 listWithXml.setdefault(str(filename).rstrip(".xml"), title)  # print(",".join(tagsList))
                 paginatorDict = tuple(listWithXml.items())
 
-        stringTags = ",".join(categoryList)
-        patternWords = re.compile("([а-яА-Я0-9_ ]+)")
-        readyTags = set(patternWords.findall(stringTags))  # все существующие теги
+        readyTags = functions.getCategory()
 
         paginator = Paginator(paginatorDict, 15)
         page = request.GET.get('page')
