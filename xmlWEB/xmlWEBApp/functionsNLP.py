@@ -6,6 +6,7 @@ from natasha import NamesExtractor, MorphVocab
 from nltk.stem.snowball import SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def getTokenize(text):
@@ -92,6 +93,18 @@ def generateBow(text):
     return xArray
 
 
+def tfVectorize(text):
+    listTf = []
+    stringTf = " ".join(text)
+    listTf.append(stringTf)
+    vectorizer = TfidfVectorizer()
+    X = vectorizer.fit_transform(listTf)
+    # print(len(vectorizer.get_feature_names_out()))
+    xArray = X.toarray()
+
+    return xArray
+
+
 def vectorize(text):
     textLoweCase = str(text).lower()
     tokenize = getTokenize(textLoweCase)
@@ -101,7 +114,8 @@ def vectorize(text):
     deleteRepeatWord = deleteRepeatWords(tokenWithoutSpaces)
     deleteName = deleteNames(deleteRepeatWord)
     getSt = getStem(deleteName)
-    vector = generateBow(getSt)
+    # vector = generateBow(getSt)
+    vector = tfVectorize(getSt)
     return vector
 
 

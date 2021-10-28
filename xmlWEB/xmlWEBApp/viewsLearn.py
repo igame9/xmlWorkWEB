@@ -1,6 +1,11 @@
+import os
 from django.http import HttpResponse
 from lxml import etree
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 from . import functionsNLP
 from sklearn.svm import SVC  # метод опорных векторов
@@ -16,83 +21,96 @@ import pickle
 # from sklearn.tree import DecisionTreeClassifier
 # from sklearn.svm import SVC
 
+# for root, dirs, files in os.walk("xmlWEBApp/xml"):
+#     for filename in files:
+
+
 def nlp(request):
     if request.method == "GET":
-        # for root, dirs, files in os.walk("xmlWEBApp/xml"):
-        #     for filename in files:
-        listPolitic = ["firstThread132.xml", "firstThread148.xml", "firstThread139.xml", "firstThread219.xml",
-                       "firstThread227.xml"]
-        listMedicine = ["firstThread133.xml", "firstThread149.xml", "firstThread189.xml", "firstThread183.xml",
-                        "firstThread276.xml"]
-        listCatastrophe = ["firstThread14.xml", "firstThread159.xml", "firstThread27.xml", "firstThread31.xml",
-                           "firstThread499.xml"]
-        listVectors = []
-        sizeVector = []
-        generalList = listPolitic + listMedicine + listCatastrophe
+        listPolitic = []
+        listIncident = []
+        listCulture = []
 
-        for gen in generalList:  # макисмальная длина вектора из всех
-            myDoc = etree.parse("xmlWEBApp/xml/" + str(gen))
-            text = myDoc.find("./text").text
-            vector = functionsNLP.vectorize(text)
-            numpyArray = np.array(vector)
-            sizeVector.append(np.size(numpyArray))
+        for root, dirs, files in os.walk("XMLculture"):
+            for filename in files:
+                listCulture.append(filename)
 
-        for pol in listPolitic:
-            myDoc = etree.parse("xmlWEBApp/xml/" + str(pol))
-            text = myDoc.find("./text").text
-            vector = functionsNLP.vectorize(text)
-            numpyArray = np.array(vector)
-            listVectors.append(numpyArray)
-            functionsNLP.saveReadyVectors(listVectors, sizeVector, 1, "politics.txt")
-        listVectors.clear()
+        for root, dirs, files in os.walk("XMLincident"):
+            for filename in files:
+                listIncident.append(filename)
 
-        for medicine in listMedicine:
-            myDoc = etree.parse("xmlWEBApp/xml/" + str(medicine))
-            text = myDoc.find("./text").text
-            vector = functionsNLP.vectorize(text)
-            numpyArray = np.array(vector)
-            listVectors.append(numpyArray)
-            functionsNLP.saveReadyVectors(listVectors, sizeVector, 2, "medicine.txt")
-        listVectors.clear()
-
-        for catastrophe in listCatastrophe:
-            myDoc = etree.parse("xmlWEBApp/xml/" + str(catastrophe))
-            text = myDoc.find("./text").text
-            vector = functionsNLP.vectorize(text)
-            numpyArray = np.array(vector)
-            listVectors.append(numpyArray)
-            functionsNLP.saveReadyVectors(listVectors, sizeVector, 3, "catastrophe.txt")
-        listVectors.clear()
+        for root, dirs, files in os.walk("XMLpolitics"):
+            for filename in files:
+                listPolitic.append(filename)
+        #
+        # listVectors = []
+        # sizeVector = []
+        # generalList = listPolitic + listIncident + listCulture
+        #
+        # for gen in generalList:  # макисмальная длина вектора из всех
+        #     myDoc = etree.parse("xmlWEBApp/xml/" + str(gen))
+        #     text = myDoc.find("./text").text
+        #     vector = functionsNLP.vectorize(text)
+        #     numpyArray = np.array(vector)
+        #     sizeVector.append(np.size(numpyArray))
+        #
+        # for pol in listPolitic:
+        #     myDoc = etree.parse("xmlWEBApp/xml/" + str(pol))
+        #     text = myDoc.find("./text").text
+        #     vector = functionsNLP.vectorize(text)
+        #     numpyArray = np.array(vector)
+        #     listVectors.append(numpyArray)
+        #     functionsNLP.saveReadyVectors(listVectors, sizeVector, 1, "politics.txt")
+        # listVectors.clear()
+        #
+        # for incident in listIncident:
+        #     myDoc = etree.parse("xmlWEBApp/xml/" + str(incident))
+        #     text = myDoc.find("./text").text
+        #     vector = functionsNLP.vectorize(text)
+        #     numpyArray = np.array(vector)
+        #     listVectors.append(numpyArray)
+        #     functionsNLP.saveReadyVectors(listVectors, sizeVector, 2, "incidents.txt")
+        # listVectors.clear()
+        #
+        # for culture in listCulture:
+        #     myDoc = etree.parse("xmlWEBApp/xml/" + str(culture))
+        #     text = myDoc.find("./text").text
+        #     vector = functionsNLP.vectorize(text)
+        #     numpyArray = np.array(vector)
+        #     listVectors.append(numpyArray)
+        #     functionsNLP.saveReadyVectors(listVectors, sizeVector, 3, "culture.txt")
+        # listVectors.clear()
 
         with open('readyCoords.txt', 'wb') as outFile:
-            for file in ['politics.txt', 'medicine.txt', 'catastrophe.txt']:
+            for file in ['politics.txt', 'incidents.txt', 'culture.txt']:
                 with open(file, 'rb') as file:
                     shutil.copyfileobj(file, outFile)
 
-    return HttpResponse("Составление векторов признаков")
+        return HttpResponse("Составление векторов признаков")
 
 
 def learnModel(request):
     if request.method == "GET":
         rawData = open("readyCoords.txt")
         dataset = np.loadtxt(rawData, delimiter=",")
-        svmClassifier = KNeighborsClassifier()
+        svmClassifier = SVC()
         svmClassifier.fit(dataset[:, :-1], dataset[:, -1])
-        pickle.dump(svmClassifier, open("modelK.dat", 'wb'))
+        pickle.dump(svmClassifier, open("modelSVM.dat", 'wb'))
         return HttpResponse("Обучение")
 
 
 def testLearn(request):
     if request.method == "GET":
-        listSize = [349]
+        listSize = [864]
         listVectors = []
-        loadedSvmClassifier = pickle.load(open("modelK.dat", 'rb'))
-        myDoc = etree.parse("xmlWEBApp/xml/" + "firstThread413.xml")
+        loadClassifier = pickle.load(open("modelSVM.dat", 'rb'))
+        myDoc = etree.parse("xmlWEBApp/xml/" + "firstThread110.xml")
         text = myDoc.find("./text").text
         vector = functionsNLP.vectorize(text)
         numpyArray = np.array(vector)
         listVectors.append(numpyArray)
         readyVector = functionsNLP.fillZerosVector(listVectors, listSize, 0)
-        svmPredict = loadedSvmClassifier.predict(readyVector)
-        return HttpResponse(svmPredict)
-
+        Predict = loadClassifier.predict(readyVector)
+        # accuracy = accuracy_score(Predict, Predict) результа и какие должны быть
+        # print(accuracy)
+        return HttpResponse(Predict)
