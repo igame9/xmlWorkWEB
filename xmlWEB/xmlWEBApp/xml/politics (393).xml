@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<doc>
+  <category verify="true" type="str" auto="true">Политика</category>
+  <title verify="true" type="str" auto="true">Путин ответил на вопрос о преемнике</title>
+  <DateAndTime verify="true" type="str" auto="true">02:16 14.10.2021</DateAndTime>
+  <views verify="true" type="str" auto="true">112225</views>
+  <text verify="true" type="str" auto="true"><![CDATA[МОСКВА, 14 окт — РИА Новости. Президент России Владимир Путин, отвечая на вопрос о преемнике и возможном участии в выборах, напомнил, что Конституция позволяет ему баллотироваться на следующий срок, отметив при этом, что никаких решений на этот счет пока не принято, а разговоры на эту тему дестабилизируют ситуацию.]]></text>
+  <tags verify="true" type="str" auto="true">Политика,Владимир Путин</tags>
+</doc>

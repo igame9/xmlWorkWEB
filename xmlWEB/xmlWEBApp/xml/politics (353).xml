@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<doc>
+  <category verify="true" type="str" auto="true">Политика</category>
+  <title verify="true" type="str" auto="true">Заседание Совета глав государств СНГ с участием Владимира Путина</title>
+  <DateAndTime verify="true" type="str" auto="true">11:08 15.10.2021</DateAndTime>
+  <views verify="true" type="str" auto="true">1097</views>
+  <text verify="true" type="str" auto="true"><![CDATA[Президент России Владимир Путин принимает участие в заседании Совета глав государств СНГ в Минске.]]></text>
+  <tags verify="true" type="str" auto="true">Политика,Минск,Владимир Путин,СНГ</tags>
+</doc>

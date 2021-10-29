@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<doc>
+  <category verify="true" type="str" auto="true">Политика</category>
+  <title verify="true" type="str" auto="true">Встреча Путина с депутатами Госдумы нового созыва. Прямая трансляция</title>
+  <DateAndTime verify="true" type="str" auto="true">15:15 12.10.2021</DateAndTime>
+  <views verify="true" type="str" auto="true">Нету информации</views>
+  <text verify="true" type="str" auto="true"><![CDATA[Президент России Владимир Путин проводит встречу с депутатами Государственной думы нового, восьмого созыва.]]></text>
+  <tags verify="true" type="str" auto="true">Политика,Владимир Путин,Госдума РФ</tags>
+</doc>

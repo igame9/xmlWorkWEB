@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<doc>
+  <category verify="true" type="str" auto="true">Политика</category>
+  <title verify="true" type="str" auto="true">Оперативное совещание Михаила Мишустина с вице-премьерами</title>
+  <DateAndTime verify="true" type="str" auto="true">12:05 25.10.2021</DateAndTime>
+  <views verify="true" type="str" auto="true">1180</views>
+  <text verify="true" type="str" auto="true"><![CDATA[Председатель правительства России Михаил Мишустин проводит оперативное совещание с вице-премьерами.]]></text>
+  <tags verify="true" type="str" auto="true">Политика,Правительство РФ,Михаил Мишустин</tags>
+</doc>

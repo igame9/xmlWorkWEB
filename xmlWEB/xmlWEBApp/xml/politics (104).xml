@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<doc>
+  <category verify="true" type="str" auto="true">Политика</category>
+  <title verify="true" type="str" auto="true">Встреча Владимира Путина и главы ФТС Владимира Булавина</title>
+  <DateAndTime verify="true" type="str" auto="true">13:52 25.10.2021</DateAndTime>
+  <views verify="true" type="str" auto="true">359</views>
+  <text verify="true" type="str" auto="true"><![CDATA[Президент России Владимир Путин проводит рабочую встречу с руководителем Федеральной таможенной службы Владимиром Булавиным.]]></text>
+  <tags verify="true" type="str" auto="true">Политика,Владимир Путин,Владимир Булавин</tags>
+</doc>
