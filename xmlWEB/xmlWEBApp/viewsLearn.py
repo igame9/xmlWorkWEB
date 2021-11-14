@@ -12,6 +12,7 @@ from sklearn.svm import SVC  # метод опорных векторов
 import numpy as np
 import shutil
 import pickle
+from .apps import loadedClassif
 
 
 #  Другие методы МL, еще больше - в библиотеке.
@@ -103,14 +104,14 @@ def testLearn(request):
     if request.method == "GET":
         listSize = [864]
         listVectors = []
-        loadClassifier = pickle.load(open("modelSVM.dat", 'rb'))
-        myDoc = etree.parse("xmlWEBApp/xml/" + "firstThread110.xml")
+
+        myDoc = etree.parse("xmlWEBApp/xml/" + "Уголовное дело возбудили в селе Верхневилюйск.xml")
         text = myDoc.find("./text").text
         vector = functionsNLP.vectorize(text)
         numpyArray = np.array(vector)
         listVectors.append(numpyArray)
         readyVector = functionsNLP.fillZerosVector(listVectors, listSize, 0)
-        Predict = loadClassifier.predict(readyVector)
+        Predict = loadedClassif.predict(readyVector)
         # accuracy = accuracy_score(Predict, Predict) результа и какие должны быть
         # print(accuracy)
         return HttpResponse(Predict)
