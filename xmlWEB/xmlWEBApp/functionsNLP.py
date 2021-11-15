@@ -97,6 +97,7 @@ def tfVectorize(text):
     listTf = []
     stringTf = " ".join(text)
     listTf.append(stringTf)
+    print(listTf)
     vectorizer = TfidfVectorizer()
     X = vectorizer.fit_transform(listTf)
     # print(len(vectorizer.get_feature_names_out()))
