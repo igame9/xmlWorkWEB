@@ -1,11 +1,13 @@
 import os
 from django.http import HttpResponse
 from lxml import etree
+from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.gaussian_process.kernels import RBF
 
 from . import functionsNLP
 from sklearn.svm import SVC  # метод опорных векторов
@@ -36,51 +38,68 @@ def nlp(request):
             for filename in files:
                 listCulture.append(filename)
 
-        for root, dirs, files in os.walk("XMLincident"):
+        for root, dirs, files in os.walk("XMLincidents"):
             for filename in files:
                 listIncident.append(filename)
 
         for root, dirs, files in os.walk("XMLpolitics"):
             for filename in files:
                 listPolitic.append(filename)
-        #
-        # listVectors = []
-        # sizeVector = []
-        # generalList = listPolitic + listIncident + listCulture
-        #
-        # for gen in generalList:  # макисмальная длина вектора из всех
-        #     myDoc = etree.parse("xmlWEBApp/xml/" + str(gen))
-        #     text = myDoc.find("./text").text
-        #     vector = functionsNLP.vectorize(text)
-        #     numpyArray = np.array(vector)
-        #     sizeVector.append(np.size(numpyArray))
-        #
-        # for pol in listPolitic:
-        #     myDoc = etree.parse("xmlWEBApp/xml/" + str(pol))
-        #     text = myDoc.find("./text").text
-        #     vector = functionsNLP.vectorize(text)
-        #     numpyArray = np.array(vector)
-        #     listVectors.append(numpyArray)
-        #     functionsNLP.saveReadyVectors(listVectors, sizeVector, 1, "politics.txt")
-        # listVectors.clear()
-        #
-        # for incident in listIncident:
-        #     myDoc = etree.parse("xmlWEBApp/xml/" + str(incident))
-        #     text = myDoc.find("./text").text
-        #     vector = functionsNLP.vectorize(text)
-        #     numpyArray = np.array(vector)
-        #     listVectors.append(numpyArray)
-        #     functionsNLP.saveReadyVectors(listVectors, sizeVector, 2, "incidents.txt")
-        # listVectors.clear()
-        #
-        # for culture in listCulture:
-        #     myDoc = etree.parse("xmlWEBApp/xml/" + str(culture))
-        #     text = myDoc.find("./text").text
-        #     vector = functionsNLP.vectorize(text)
-        #     numpyArray = np.array(vector)
-        #     listVectors.append(numpyArray)
-        #     functionsNLP.saveReadyVectors(listVectors, sizeVector, 3, "culture.txt")
-        # listVectors.clear()
+
+        listVectors = []
+        sizeVector = []
+        generalList = listPolitic + listIncident + listCulture
+
+        i = 0
+        for gen in generalList:  # макисмальная длина вектора из всех
+            print(gen)
+            i = i + 1
+            print(i)
+            myDoc = etree.parse("xmlWEBApp/xml/" + str(gen))
+            text = myDoc.find("./text").text
+            vector = functionsNLP.vectorize(text)
+            numpyArray = np.array(vector)
+            sizeVector.append(np.size(numpyArray))
+
+        print("Общая размерность установлена")
+        i = 0
+        for pol in listPolitic:
+            print(pol)
+            i = i + 1
+            print(i)
+            myDoc = etree.parse("xmlWEBApp/xml/" + str(pol))
+            text = myDoc.find("./text").text
+            vector = functionsNLP.vectorize(text)
+            numpyArray = np.array(vector)
+            listVectors.append(numpyArray)
+            functionsNLP.saveReadyVectors(listVectors, sizeVector, 1, "politics.txt")
+        listVectors.clear()
+
+        i = 0
+        for incident in listIncident:
+            print(incident)
+            i = i + 1
+            print(i)
+            myDoc = etree.parse("xmlWEBApp/xml/" + str(incident))
+            text = myDoc.find("./text").text
+            vector = functionsNLP.vectorize(text)
+            numpyArray = np.array(vector)
+            listVectors.append(numpyArray)
+            functionsNLP.saveReadyVectors(listVectors, sizeVector, 2, "incidents.txt")
+        listVectors.clear()
+
+        i = 0
+        for culture in listCulture:
+            print(culture)
+            i = i + 1
+            print(i)
+            myDoc = etree.parse("xmlWEBApp/xml/" + str(culture))
+            text = myDoc.find("./text").text
+            vector = functionsNLP.vectorize(text)
+            numpyArray = np.array(vector)
+            listVectors.append(numpyArray)
+            functionsNLP.saveReadyVectors(listVectors, sizeVector, 3, "culture.txt")
+        listVectors.clear()
 
         with open('readyCoords.txt', 'wb') as outFile:
             for file in ['politics.txt', 'incidents.txt', 'culture.txt']:
@@ -95,6 +114,10 @@ def learnModel(request):
         rawData = open("readyCoords.txt")
         dataset = np.loadtxt(rawData, delimiter=",")
         svmClassifier = SVC()
+        # clf = LogisticRegression(random_state=0)
+        # kernel = 1.0 * RBF(1.0)
+        # gpc = GaussianProcessClassifier(kernel=kernel, random_state=0)
+        # clf = GaussianNB()
         svmClassifier.fit(dataset[:, :-1], dataset[:, -1])
         pickle.dump(svmClassifier, open("modelSVM.dat", 'wb'))
         return HttpResponse("Обучение")
