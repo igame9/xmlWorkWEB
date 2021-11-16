@@ -15,4 +15,5 @@ urlpatterns = [
     path('learn/nlp', viewsLearn.nlp, name="_nlp_"),
     path('learn/learnModel', viewsLearn.learnModel, name="_learn_"),
     path('learn/test', viewsLearn.testLearn, name="_test_"),
+    path('learn/accuracy', viewsLearn.accuracyClassif, name="_accuracy_"),
 ]
