@@ -6,19 +6,13 @@ from lxml import etree
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
 import pandas as pd
 from sklearn.pipeline import Pipeline
-
+from sklearn.svm import SVC
 from . import functionsNLP
-import numpy as np
-
 from .apps import loadedClassif
 
-
-# for root, dirs, files in os.walk("xmlWEBApp/xml"):
-#     for filename in files:
 
 
 def nlp(request):
@@ -141,11 +135,11 @@ def learnModel(request):
         y = dataSet['class']
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=15)
 
-        KNN = Pipeline([('vect', CountVectorizer()),
+        model = Pipeline([('vect', CountVectorizer()),
                         ('tfidf', TfidfTransformer()),
-                        ('clf', KNeighborsClassifier(n_neighbors=1))])
-        KNN.fit(X_train, y_train)
-        pickle.dump(KNN, open("KNN.dat", 'wb'))
+                        ('clf', SVC())])
+        model.fit(X_train, y_train)
+        pickle.dump(model, open("SVC.dat", 'wb'))
         return HttpResponse("Обучение")
 
 
