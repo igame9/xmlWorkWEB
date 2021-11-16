@@ -16,7 +16,7 @@ def getTokenize(text):
 
 def removeStopWords(text):
     readyText = []
-    anySymbols = ["``", '``', "''"]
+    anySymbols = ["``", '``', "''", "—", "."]
     anyWords = ["та", "иная", "риа", "апр"]
     stopword = stopwords.words('russian') + [a for a in punctuation] + anySymbols + anyWords
     for word in text:
@@ -93,20 +93,21 @@ def generateBow(text):
     return xArray
 
 
-def tfVectorize(text):
-    listTf = []
-    stringTf = " ".join(text)
-    listTf.append(stringTf)
-    print(listTf)
-    vectorizer = TfidfVectorizer()
-    X = vectorizer.fit_transform(listTf)
-    # print(len(vectorizer.get_feature_names_out()))
-    xArray = X.toarray()
-
-    return xArray
+def tfVectorize(listText):
+    # flatList = [item for sublist in listText for item in sublist]
+    # print(flatList)
+    # # listTf.append(stringTf)
+    # # print(listTf)
+    # vectorizer = TfidfVectorizer()
+    # X = vectorizer.fit_transform(flatList)
+    # # # print(len(vectorizer.get_feature_names_out()))
+    # # xArray = X.toarray()
+    # print(X)
+    pass
 
 
 def vectorize(text):
+    lestRet = []
     textLoweCase = str(text).lower()
     tokenize = getTokenize(textLoweCase)
     tokenWithoutStop = removeStopWords(tokenize)
@@ -115,9 +116,10 @@ def vectorize(text):
     deleteRepeatWord = deleteRepeatWords(tokenWithoutSpaces)
     deleteName = deleteNames(deleteRepeatWord)
     getSt = getStem(deleteName)
+    string = " ".join(getSt)
     # vector = generateBow(getSt)
-    vector = tfVectorize(getSt)
-    return vector
+    # vector = tfVectorize(getSt)
+    return string
 
 
 def fillZerosVector(numpyArrays, listSize, attribute):
