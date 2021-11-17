@@ -53,6 +53,26 @@ function deleteXml() {
     xhr.send(JSON.stringify(data));
     return false;
 }
+
+
+function getPredict() {
+    const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    var xhr = new XMLHttpRequest();
+        xhr.onload = (e) => {
+        document.getElementById("predict").textContent = e.target.response;
+
+    };
+    xhr.open("POST", "/getPredict/predict", true);
+    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    var nameFile = "{{nameXml}}"
+    data = {
+      "nameFile":nameFile
+    };
+    xhr.send(JSON.stringify(data));
+    return false;
+}
 </script>
 {% endblock %}
 
@@ -68,6 +88,7 @@ function deleteXml() {
       <div class="row">
         <div class="col-md-12">
           <h1 id="nameFile">{{title}}</h1>
+          <h2 id="predict"></h2>
         </div>
       </div>
     </div>
@@ -119,6 +140,7 @@ function deleteXml() {
             <input type="submit" name="submit" value="Сохранить">
 		    <input onclick="deleteXml()" type="button" value="Удалить статью">
             <input type="button" value="На главную" onClick='location.href="/"'>
+            <input type="button" value="Получить предсказание" onClick='getPredict()'>
           </div>
         </div>
       </div>

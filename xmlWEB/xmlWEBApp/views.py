@@ -8,9 +8,9 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from lxml import etree
-import re
 from datetime import date
 from . import functions
+from . import functionsNLP
 
 
 # Create your views here.
@@ -248,3 +248,13 @@ def findXML(request):
             xmlPag = paginator.page(paginator.num_pages)
         return render(request, "index.html", {"xmlPag": xmlPag,
                                               "readyTags": request.session['tagsReady']})
+
+
+def getPredict(request):
+    if request.method == 'POST' and request.is_ajax():
+        data = request.body.decode('utf-8')
+        jsonData = json.loads(data)
+        nameFile = jsonData["nameFile"]
+        predict = functionsNLP.getPredict(nameFile)
+        return HttpResponse(predict)
+

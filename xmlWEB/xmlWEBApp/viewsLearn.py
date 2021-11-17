@@ -14,9 +14,9 @@ from . import functionsNLP
 from .apps import loadedClassif
 
 
-
 def nlp(request):
     if request.method == "GET":
+        # Первая версия кода - устарела
         # listPolitic = []
         # listIncident = []
         listCulture = ["firstThreadculture0", "firstThreadculture1", "firstThreadculture2", "firstThreadculture3",
@@ -136,8 +136,8 @@ def learnModel(request):
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=15)
 
         model = Pipeline([('vect', CountVectorizer()),
-                        ('tfidf', TfidfTransformer()),
-                        ('clf', SVC())])
+                          ('tfidf', TfidfTransformer()),
+                          ('clf', SVC())])
         model.fit(X_train, y_train)
         pickle.dump(model, open("SVC.dat", 'wb'))
         return HttpResponse("Обучение")
@@ -145,15 +145,8 @@ def learnModel(request):
 
 def testLearn(request):
     if request.method == "GET":
-
-        myDoc = etree.parse("xmlWEBApp/xml/" + "Тест МЛ.xml")
-        text = myDoc.find("./text").text
-        vector = functionsNLP.vectorize(text)
-
-        Predict = loadedClassif.predict([vector])
-        # accuracy = accuracy_score(Predict, Predict) результа и какие должны быть
-        # print(accuracy)
-        return HttpResponse(Predict)
+        predict = functionsNLP.getPredict("Тест Мл")
+        return HttpResponse(predict)
 
 
 def accuracyClassif(request):

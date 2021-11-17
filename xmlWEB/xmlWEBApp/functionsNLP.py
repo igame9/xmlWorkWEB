@@ -6,7 +6,8 @@ from natasha import NamesExtractor, MorphVocab
 from nltk.stem.snowball import SnowballStemmer
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
+from lxml import etree
+from .apps import loadedClassif
 
 
 def getTokenize(text):
@@ -142,3 +143,12 @@ def saveReadyVectors(listOfVectors, sizeVector, attr, fileName):
         StringVector = ",".join(listVector)
         file.write(StringVector + "\n")
     file.close()
+
+
+def getPredict(nameFile):
+    myDoc = etree.parse("xmlWEBApp/xml/" + str(nameFile) + ".xml")
+    text = myDoc.find("./text").text
+    vector = vectorize(text)
+    Predict = loadedClassif.predict([vector])
+    stringPredict = "Статья относится к классу - " + Predict
+    return stringPredict

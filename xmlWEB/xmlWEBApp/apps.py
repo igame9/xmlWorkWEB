@@ -1,8 +1,8 @@
 from django.apps import AppConfig
+import pickle
 
 
 def loadClassif():
-    import pickle
     loaded = pickle.load(open("KNN.dat", 'rb'))
     print("Классификатор загружен")
     return loaded
