@@ -66,18 +66,37 @@
 <!--        <label for="searchText">Имя</label>-->
         <form method="post" action="/findXML/find">
                 {% csrf_token %}
-            <p><input type="text" placeholder="Имя статьи" id="searchText" name="reg"></p>
-            <p><input type="date" placeholder="Начальная дата" name="firstDate" id="startDate"> - <input type="date" name="secondDate"  id="endDate"></p>
-            <p><input type="search" name="tags" placeholder="Возможные теги">
+            <p><input type="text" value="{{findNameFile}}" placeholder="Имя статьи" id="searchText" name="reg"></p>
+            <p><input type="date"  value="{{findStartDate}}" placeholder="Начальная дата" name="firstDate" id="startDate"> - <input type="date" value="{{findEndDate}}" name="secondDate"  id="endDate"></p>
+            <p><input type="search" value="{{findTags}}" name="tags" placeholder="Возможные теги">
             <p><select name="category">
             <option></option>
+            {% if findCategory %}
+                <option selected>{{findCategory}}</option>
+            {% else %}
                 {% for tag in readyTags %}
               <option>{{tag}}</option>
                 {% endfor %}
+            {% endif %}
             </select>
+
+            {% if findSort == "nameSort" %}
+            <p><input checked name="sort" type="radio" value="nameSort"> Сортировать по имени </p>
+                {% else %}
             <p><input name="sort" type="radio" value="nameSort"> Сортировать по имени </p>
+            {% endif %}
+
+            {% if findSort == "dateSort" %}
+            <p><input checked name="sort" type="radio" value="dateSort"> Сортировать по дате </p>
+                {% else %}
             <p><input name="sort" type="radio" value="dateSort"> Сортировать по дате </p>
-            <p><input name="sort" type="radio" value="viewSort"> Сортировать по просмотрам </p>
+            {% endif %}
+
+            {% if findSort == "viewSort" %}
+            <p><input checked name="sort" type="radio" value="viewSort"> Сортировать по просмотрам </p>
+                {% else %}
+            <p><input  name="sort" type="radio" value="viewSort"> Сортировать по просмотрам </p>
+            {% endif %}
 
             <p><input type="submit" name="submit" value="Найти статьи">
         </form>

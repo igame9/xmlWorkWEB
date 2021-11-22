@@ -44,7 +44,7 @@ def getListSearchFiles(category, tags, data, startDate, endDate):
             for filename in files:
                 myDoc = etree.parse("xmlWEBApp/xml/" + str(filename))
                 title = myDoc.find("./title").text
-                if examplePattern.match(title):
+                if examplePattern.search(title): # заменил match на search (и в listand)
                     # print(title)
                     listSearchFiles.setdefault(str(filename.rstrip(".xml")), title)
                     # print(listSearchFiles)
@@ -115,7 +115,7 @@ def getListAnd(listSearchFiles, startDate, endDate, data, category, tags):
         # ......
         # find name
         examplePattern = re.compile("(" + str(data) + ".+" + ")")
-        if not examplePattern.match(value):  # здесь сравнивал по имени файла вместо заголовка!!!
+        if not examplePattern.search(value):  # здесь сравнивал по имени файла вместо заголовка!!!
             countNot = countNot + 1
 
         # ........

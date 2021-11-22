@@ -195,19 +195,40 @@ def findXML(request):
         endDate = request.POST.get("secondDate")
         tags = request.POST.get("tags")
         category = request.POST.get("category")
+
         sortValue = request.POST.get("sort")
+        request.session['findNameFile'] = ""
+        request.session['findStartDate'] = ""
+        request.session['findEndDate'] = ""
+        request.session['findTags'] = ""
+        request.session['findCategory'] = ""
+        request.session['findSort'] = ""
+
+        if data != "":
+            request.session['findNameFile'] = str(data)
+        if startDate != "":
+            request.session['findStartDate'] = str(startDate)
+        if endDate != "":
+            request.session['findEndDate'] = str(endDate)
+        if tags != "":
+            request.session['findTags'] = str(tags)
+        if category != "":
+            request.session['findCategory'] = str(category)
 
         if sortValue == "nameSort":
+            request.session['findSort'] = "nameSort"
             sortName = True
         else:
             sortName = False
 
         if sortValue == "dateSort":
+            request.session['findSort'] = "dateSort"
             dateSort = True
         else:
             dateSort = False
 
         if sortValue == "viewSort":
+            request.session['findSort'] = "viewSort"
             viewSort = True
         else:
             viewSort = False
@@ -232,7 +253,14 @@ def findXML(request):
             # If page is out of range (e.g. 9999), deliver last page of results.
             xmlPag = paginator.page(paginator.num_pages)
         return render(request, "index.html", {"xmlPag": xmlPag,
-                                              "readyTags": request.session['tagsReady']})
+                                              "readyTags": request.session['tagsReady'],
+                                              "findNameFile": request.session['findNameFile'],
+                                              "findStartDate": request.session['findStartDate'],
+                                              "findEndDate": request.session['findEndDate'],
+                                              "findTags": request.session['findTags'],
+                                              "findCategory": request.session['findCategory'],
+                                              "findSort":  request.session['findSort']
+                                              })
 
     if request.method == "GET":
         paginatorDict = tuple(request.session['data'].items())
@@ -247,7 +275,14 @@ def findXML(request):
             # If page is out of range (e.g. 9999), deliver last page of results.
             xmlPag = paginator.page(paginator.num_pages)
         return render(request, "index.html", {"xmlPag": xmlPag,
-                                              "readyTags": request.session['tagsReady']})
+                                              "readyTags": request.session['tagsReady'],
+                                              "findNameFile": request.session['findNameFile'],
+                                              "findStartDate": request.session['findStartDate'],
+                                              "findEndDate": request.session['findEndDate'],
+                                              "findTags": request.session['findTags'],
+                                              "findCategory": request.session['findCategory'],
+                                              "findSort": request.session['findSort']
+                                              })
 
 
 def getPredict(request):
@@ -257,4 +292,3 @@ def getPredict(request):
         nameFile = jsonData["nameFile"]
         predict = functionsNLP.getPredict(nameFile)
         return HttpResponse(predict)
-
