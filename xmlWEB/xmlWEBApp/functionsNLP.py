@@ -4,9 +4,9 @@ from nltk.corpus import stopwords
 import re
 from natasha import NamesExtractor, MorphVocab
 from nltk.stem.snowball import SnowballStemmer
-from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 from lxml import etree
+from sklearn.feature_extraction.text import CountVectorizer
 from .apps import loadedClassif
 
 
@@ -18,7 +18,7 @@ def getTokenize(text):
 def removeStopWords(text):
     readyText = []
     anySymbols = ["``", '``', "''", "—", "."]
-    anyWords = ["та", "иная", "риа", "апр"]
+    anyWords = ["та", "иная", "риа", "апр", "на", "риа"]
     stopword = stopwords.words('russian') + [a for a in punctuation] + anySymbols + anyWords
     for word in text:
         if word not in stopword:
@@ -82,16 +82,7 @@ def getStem(text):
 
 
 def generateBow(text):
-    listBow = []
-    stringBow = " ".join(text)
-    listBow.append(stringBow)
-
-    vectorizer = CountVectorizer()
-    X = vectorizer.fit_transform(listBow)
-    xArray = X.toarray()
-    # print(xArray)
-    # print(vectorizer.get_feature_names_out())
-    return xArray
+    pass
 
 
 def tfVectorize(listText):
@@ -145,10 +136,16 @@ def saveReadyVectors(listOfVectors, sizeVector, attr, fileName):
     file.close()
 
 
-def getPredict(nameFile):
+def getPredictFile(nameFile):
     myDoc = etree.parse("xmlWEBApp/xml/" + str(nameFile) + ".xml")
     text = myDoc.find("./text").text
     vector = vectorize(text)
     Predict = loadedClassif.predict([vector])
     stringPredict = "Статья относится к классу - " + Predict
     return stringPredict
+
+
+def getPredictText(text):
+    vector = vectorize(text)
+    Predict = loadedClassif.predict([vector])
+    return Predict

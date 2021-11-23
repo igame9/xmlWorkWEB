@@ -3,7 +3,7 @@ import os
 
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
@@ -259,7 +259,7 @@ def findXML(request):
                                               "findEndDate": request.session['findEndDate'],
                                               "findTags": request.session['findTags'],
                                               "findCategory": request.session['findCategory'],
-                                              "findSort":  request.session['findSort']
+                                              "findSort": request.session['findSort']
                                               })
 
     if request.method == "GET":
@@ -290,5 +290,20 @@ def getPredict(request):
         data = request.body.decode('utf-8')
         jsonData = json.loads(data)
         nameFile = jsonData["nameFile"]
-        predict = functionsNLP.getPredict(nameFile)
+        predict = functionsNLP.getPredictFile(nameFile)
         return HttpResponse(predict)
+
+
+def autoFillArticle(request):
+    if request.method == 'POST' and request.is_ajax():
+        dictWithFillData = {}
+        data = request.body.decode('utf-8')
+        jsonData = json.loads(data)
+        text = jsonData["text"]
+        if text == "":
+            return HttpResponse(json.dumps("Text Not Found"))
+        classOfArticle = functionsNLP.getPredictText(text)
+        dictWithFillData.setdefault("category", str(classOfArticle).replace("'", "").replace("[", "").replace("]", ""))
+        bagOfWords = functionsNLP.generateBow(text)
+        print(bagOfWords)
+        return JsonResponse(json.loads(json.dumps(dictWithFillData)))

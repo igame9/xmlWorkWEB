@@ -114,22 +114,6 @@ def nlp(request):
 
 def learnModel(request):
     if request.method == "GET":
-        # rawData = open("readyCoords.txt")
-        # dataset = np.loadtxt(rawData, delimiter=",")
-        # svmClassifier = SVC()
-        # clf = LogisticRegression(random_state=0)
-        # kernel = 1.0 * RBF(1.0)
-        # gpc = GaussianProcessClassifier(kernel=kernel, random_state=0)
-        # clf = GaussianNB()
-        # KNNmodel = KNeighborsClassifier(n_neighbors=1)
-        # clf = LogisticRegression(random_state=0)
-        # clf.fit(dataset[:, :-1], dataset[:, -1])
-        # regressor = RandomForestRegressor(n_estimators=20, random_state=0)
-        # clf = LinearDiscriminantAnalysis()
-        # clf = MLPClassifier(random_state=1, max_iter=300)
-        # KNNmodel.fit(dataset[:, :-1], dataset[:, -1])
-        # pickle.dump(KNNmodel, open("test.dat", 'wb'))
-
         dataSet = pd.read_csv("dataFrame.csv")
         X = dataSet['Text']
         y = dataSet['class']
@@ -145,7 +129,7 @@ def learnModel(request):
 
 def testLearn(request):
     if request.method == "GET":
-        predict = functionsNLP.getPredict("Тест Мл")
+        predict = functionsNLP.getPredictFile("Тест Мл")
         return HttpResponse(predict)
 
 
