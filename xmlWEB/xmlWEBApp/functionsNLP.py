@@ -6,8 +6,8 @@ from natasha import NamesExtractor, MorphVocab
 from nltk.stem.snowball import SnowballStemmer
 import numpy as np
 from lxml import etree
-from sklearn.feature_extraction.text import CountVectorizer
 from .apps import loadedClassif
+from rutermextract import TermExtractor
 
 
 def getTokenize(text):
@@ -81,21 +81,12 @@ def getStem(text):
     return stemTokens
 
 
-def generateBow(text):
-    pass
-
-
-def tfVectorize(listText):
-    # flatList = [item for sublist in listText for item in sublist]
-    # print(flatList)
-    # # listTf.append(stringTf)
-    # # print(listTf)
-    # vectorizer = TfidfVectorizer()
-    # X = vectorizer.fit_transform(flatList)
-    # # # print(len(vectorizer.get_feature_names_out()))
-    # # xArray = X.toarray()
-    # print(X)
-    pass
+def getKeyWords(text):
+    keyWords = []
+    term_extractor = TermExtractor()
+    for term in term_extractor(text):
+        keyWords.append(term.normalized)
+    return keyWords[:3]
 
 
 def vectorize(text):
@@ -109,8 +100,6 @@ def vectorize(text):
     deleteName = deleteNames(deleteRepeatWord)
     getSt = getStem(deleteName)
     string = " ".join(getSt)
-    # vector = generateBow(getSt)
-    # vector = tfVectorize(getSt)
     return string
 
 

@@ -1,5 +1,6 @@
 import json
 import os
+import re
 
 from django.contrib import messages
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -11,6 +12,7 @@ from lxml import etree
 from datetime import date
 from . import functions
 from . import functionsNLP
+from datetime import date
 
 
 # Create your views here.
@@ -304,6 +306,24 @@ def autoFillArticle(request):
             return HttpResponse(json.dumps("Text Not Found"))
         classOfArticle = functionsNLP.getPredictText(text)
         dictWithFillData.setdefault("category", str(classOfArticle).replace("'", "").replace("[", "").replace("]", ""))
-        bagOfWords = functionsNLP.generateBow(text)
-        print(bagOfWords)
+        keyWords = functionsNLP.getKeyWords(text)
+        stringKeyWords = ",".join(keyWords)
+        dictWithFillData.setdefault("keyWords", stringKeyWords)
+        currentDate = date.today()
+        stringDate = currentDate.strftime("%d.%m.%Y")
+        dictWithFillData.setdefault("date", stringDate)
+        splitRegex = re.compile(r'[.|!|?|…]')
+        regexRia = re.compile(r"(- РИА Новости)")
+        sentences = filter(lambda t: t, [t.strip() for t in splitRegex.split(text)])
+        stringTitle = ""
+        i = 0
+        for s in sentences:
+            if i == 1:
+                break
+            if regexRia.search(s):
+                pass
+            else:
+                i = i + 1
+                stringTitle = str(s)
+        dictWithFillData.setdefault("title", stringTitle)
         return JsonResponse(json.loads(json.dumps(dictWithFillData)))

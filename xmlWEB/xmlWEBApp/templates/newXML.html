@@ -68,6 +68,9 @@
             else{
               document.getElementById("message").textContent = "";
               document.getElementById("category").textContent = data.category;
+              document.getElementById("tags").textContent = data.keyWords;
+              document.getElementById("dateAndTime").textContent = data.date;
+              document.getElementById("title").textContent = data.title;
             }
       };
       xhr.open("POST", "/newXML/autofill", true);
@@ -76,7 +79,7 @@
       xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
       var text = document.getElementById("text").textContent;
         if (text === ""){
-          document.getElementById("message").textContent = "Введите текст статьи для продолжения работы";
+          document.getElementById("message").textContent = "Введите текст статьи для автоматического формирования статьи";
           return false;
         }
        data = {
