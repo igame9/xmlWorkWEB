@@ -31,6 +31,7 @@ def index(request):  # заполнение индексной страницы
                 listWithXml.setdefault(str(filename).rstrip(".xml"), title)  # print(",".join(tagsList))
                 paginatorDict = tuple(listWithXml.items())
 
+        countOfArticles = len(listWithXml)
         readyTags = functions.getCategory()
 
         paginator = Paginator(paginatorDict, 15)
@@ -44,7 +45,9 @@ def index(request):  # заполнение индексной страницы
             # If page is out of range (e.g. 9999), deliver last page of results.
             xmlPag = paginator.page(paginator.num_pages)
         return render(request, "index.html", {"xmlPag": xmlPag,
-                                              "readyTags": readyTags})
+                                              "readyTags": readyTags,
+                                              "countArticles": countOfArticles
+                                              })
 
 
 @csrf_exempt
@@ -197,8 +200,8 @@ def findXML(request):
         endDate = request.POST.get("secondDate")
         tags = request.POST.get("tags")
         category = request.POST.get("category")
-
         sortValue = request.POST.get("sort")
+
         request.session['findNameFile'] = ""
         request.session['findStartDate'] = ""
         request.session['findEndDate'] = ""
@@ -242,8 +245,15 @@ def findXML(request):
         functions.makeSort(sortName, dateSort, listAnd, viewSort, request)
 
         request.session['tagsReady'] = functions.getCategory()  # Список категорий
+        request.session['wasSearch'] = True
 
         paginatorDict = tuple(request.session['data'].items())
+        request.session['countOfArticles'] = len(paginatorDict)
+        if len(paginatorDict) == 0:
+            request.session['message'] = "Поиск не дал никакого результата"
+        else:
+            request.session['message'] = ""
+
         paginator = Paginator(paginatorDict, 15)
         page = request.GET.get('page')
         try:
@@ -261,7 +271,10 @@ def findXML(request):
                                               "findEndDate": request.session['findEndDate'],
                                               "findTags": request.session['findTags'],
                                               "findCategory": request.session['findCategory'],
-                                              "findSort": request.session['findSort']
+                                              "findSort": request.session['findSort'],
+                                              "countArticles": request.session['countOfArticles'],
+                                              "message": request.session['message'],
+                                              "wasSearch": request.session['wasSearch']
                                               })
 
     if request.method == "GET":
@@ -283,7 +296,10 @@ def findXML(request):
                                               "findEndDate": request.session['findEndDate'],
                                               "findTags": request.session['findTags'],
                                               "findCategory": request.session['findCategory'],
-                                              "findSort": request.session['findSort']
+                                              "findSort": request.session['findSort'],
+                                              "countArticles": request.session['countOfArticles'],
+                                              "message": request.session['message'],
+                                              "wasSearch": request.session['wasSearch']
                                               })
 
 
@@ -327,3 +343,23 @@ def autoFillArticle(request):
                 stringTitle = str(s)
         dictWithFillData.setdefault("title", stringTitle)
         return JsonResponse(json.loads(json.dumps(dictWithFillData)))
+
+
+def classifyRawText(request):
+    if request.method == 'POST' and request.is_ajax():
+        dictWithFillData = {}
+        data = request.body.decode('utf-8')
+        jsonData = json.loads(data)
+        text = jsonData["text"]
+        if not text:
+            print("Пуст")
+            dictWithFillData.setdefault("predict", "Введите текст для классификации")
+            return JsonResponse(json.loads(json.dumps(dictWithFillData)))
+
+        predict = functionsNLP.getPredictText(text)
+        dictWithFillData.setdefault("predict", "Данная статья относится к категории: " +
+                                    str(predict).replace("'", "").replace("[", "").replace("]", ""))
+        return JsonResponse(json.loads(json.dumps(dictWithFillData)))
+
+    if request.method == 'GET':
+        return render(request, "classifyRaw.html")

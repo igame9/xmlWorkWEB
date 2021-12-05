@@ -3,7 +3,33 @@
 {% block javascript %}
 <script type="text/javascript">
 
+  function checkData(){
+    var argumentsLength = arguments.length;
+    var countZeros = 0;
+    for (var i = 0; i < arguments.length; i++) {
+      if(arguments[i] === ""){
+        countZeros = countZeros + 1;
+      }
+    }
+    if (countZeros === argumentsLength ){
+        return false;
+    }
+    return true;
+  }
 
+  function validateForm(formId)
+    {
+    var name = document.getElementById("searchText").value;
+    var firstDate = document.getElementById("startDate").value;
+    var secondDate = document.getElementById("endDate").value;
+    var tags = document.getElementById("tags").value;
+    var categories =  document.getElementById("categories").value;
+
+    if (!checkData(name, firstDate, secondDate, tags, categories)){
+        document.getElementById("message").textContent = "Введите какие-нибудь данные для поиска статей";
+        return false;
+    }
+   }
 </script>
 {% endblock %}
 
@@ -55,21 +81,23 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-          <h1>Сервис для работы с коллекцией статей</h1>
+          <h1>Сервис для работы с коллекцией статей, найдено: {{countArticles}} статей</h1>
             <input onclick="document.location = '/newXML/create'" type="button" value="Добавить новую статью">
+            <input onclick="document.location = '/classify/Rawtext'" type="button" value="Классифицировать текст">
         </div>
       </div>
     </div>
   </div>
   <div class="py-5">
-    <div class="container">
+    <div class="container" >
+        <div id="message">{{message}}</div>
 <!--        <label for="searchText">Имя</label>-->
-        <form method="post" action="/findXML/find">
+        <form id="myForm" method="post" action="/findXML/find" onsubmit="return validateForm('myForm');">
                 {% csrf_token %}
-            <p><input type="text" value="{{findNameFile}}" placeholder="Имя статьи" id="searchText" name="reg"></p>
-            <p><input type="date"  value="{{findStartDate}}" placeholder="Начальная дата" name="firstDate" id="startDate"> - <input type="date" value="{{findEndDate}}" name="secondDate"  id="endDate"></p>
-            <p><input type="search" value="{{findTags}}" name="tags" placeholder="Возможные теги">
-            <p><select name="category">
+            <p><input type="text" value="{{findNameFile}}" placeholder="Имя статьи для поиска" id="searchText" name="reg"></p>
+            <p><input type="date"  value="{{findStartDate}}" name="firstDate" id="startDate"> - <input type="date" value="{{findEndDate}}" name="secondDate"  id="endDate"></p>
+            <p><input type="search" value="{{findTags}}" name="tags" placeholder="Теги статьи для поиска" id="tags">
+            <p><select id="categories" name="category">
             <option></option>
             {% if findCategory %}
                 <option selected>{{findCategory}}</option>
@@ -98,7 +126,10 @@
             <p><input  name="sort" type="radio" value="viewSort"> Сортировать по просмотрам </p>
             {% endif %}
 
-            <p><input type="submit" name="submit" value="Найти статьи">
+            <p><input type="submit" name="submit"  value="Найти статьи">
+              {% if wasSearch %}
+                        <a class="homeButton" href="/">Сбросить поиск</a>
+                {% endif %}
         </form>
       <div class="row">
         <div class="col-md-12">
@@ -118,15 +149,16 @@
                           <a class="likeAButton" href="?page={{ xmlPag.next_page_number }}">Следущая страница</a>
                       {% endif %}
 
+                      {% if xmlPag.has_next %}
                       <span class="current">
                           Страница {{ xmlPag.number }} из {{ xmlPag.paginator.num_pages }}
                       </span>
-
-                      {% if xmlPag.has_previous or xmlPag.has_nex %}  <!-- Подумать -->
-                          <a class="homeButton" href="/">Сбросить</a>
-                              {% else %}
-                                <a class="homeButton" href="/">Сбросить</a>
                       {% endif %}
+
+                      {% if xmlPag.has_previous %}  <!-- Подумать -->
+                          <a class="homeButton" href="?page=1">На первую страницу</a>
+                      {% endif %}
+
                   </span>
               </div>
           </div>

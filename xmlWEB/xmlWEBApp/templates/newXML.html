@@ -63,9 +63,13 @@
             var data = JSON.parse(e.target.response);
             if (data === "Text Not Found"){
               document.getElementById("message").textContent = "Введите текст статьи для продолжения работы";
+              var textBold = document.getElementById("textBold");
+              textBold.style.fontWeight = 'bold';
               return false;
             }
             else{
+              var textBold = document.getElementById("textBold");
+              textBold.style.fontWeight = 'normal';
               document.getElementById("message").textContent = "";
               document.getElementById("category").textContent = data.category;
               document.getElementById("tags").textContent = data.keyWords;
@@ -80,6 +84,8 @@
       var text = document.getElementById("text").textContent;
         if (text === ""){
           document.getElementById("message").textContent = "Введите текст статьи для автоматического формирования статьи";
+          var textBold = document.getElementById("textBold");
+          textBold.style.fontWeight = 'bold';
           return false;
         }
        data = {
@@ -90,6 +96,12 @@
 }
 </script>
 {% endblock %}
+
+<style>
+table {
+  table-layout: fixed;
+}
+</style>
 
 <head>
   <meta charset="utf-8">
@@ -140,7 +152,7 @@
                   <td contenteditable id="dateAndTime"></td>
                 </tr>
                 <tr>
-                  <td>Текст статьи</td>
+                  <td id="textBold">Текст статьи</td>
                   <td contenteditable id="text"></td>
                 </tr>
                  <tr>
@@ -149,9 +161,9 @@
                 </tr>
               </tbody>
             </table>
-            <input type="submit" name="submit" value="Создать статью" onclick=createXML()>
+            <input type="submit" name="submit" value="Сохранить статью" onclick=createXML()>
             <input type="button" value="На главную" onClick='location.href="/"'>
-            <input type="button" value="Автоматически сформировать статью" onClick='aFill()'>
+            <input type="button" value="Сформировать статью по введенному тексту" onClick='aFill()'>
           </div>
         </div>
       </div>

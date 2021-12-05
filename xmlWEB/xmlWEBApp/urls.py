@@ -18,5 +18,5 @@ urlpatterns = [
     path('learn/accuracy', viewsLearn.accuracyClassif, name="_accuracy_"),
     path('getPredict/predict', views.getPredict, name="_getPredict_"),
     path('newXML/autofill', views.autoFillArticle, name="_autoFillArticle_"),
-
+    path('classify/Rawtext', views.classifyRawText, name="_classifyRawText_"),
 ]

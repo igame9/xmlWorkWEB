@@ -36,22 +36,26 @@
 }
 
 function deleteXml() {
-
-    const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-    var xhr = new XMLHttpRequest();
-        xhr.onload = (e) => {
-        window.location="";
-    };
-    xhr.open("DELETE", "/deleteFile/delete", true);
-    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-    xhr.setRequestHeader("Content-type", "application/json");
-    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    var nameFile = "{{nameXml}}"
-    data = {
-      "nameFile":nameFile
-    };
-    xhr.send(JSON.stringify(data));
-    return false;
+    if (confirm('Вы действительно хотите удалить статью ?')) {
+      const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+      var xhr = new XMLHttpRequest();
+          xhr.onload = (e) => {
+          window.location="";
+      };
+      xhr.open("DELETE", "/deleteFile/delete", true);
+      xhr.setRequestHeader("X-CSRFToken", csrftoken);
+      xhr.setRequestHeader("Content-type", "application/json");
+      xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+      var nameFile = "{{nameXml}}"
+      data = {
+        "nameFile":nameFile
+      };
+      xhr.send(JSON.stringify(data));
+      return false;
+       }
+       else {
+          return false;
+       }
 }
 
 
@@ -75,6 +79,12 @@ function getPredict() {
 }
 </script>
 {% endblock %}
+
+<style>
+table {
+  table-layout: fixed;
+}
+</style>
 
 <head>
   <meta charset="utf-8">

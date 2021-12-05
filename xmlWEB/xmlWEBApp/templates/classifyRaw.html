@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+{% block javascript %}
+<script type="text/javascript">
+function getPredict() {
+    const csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+    var xhr = new XMLHttpRequest();
+        xhr.onload = (e) => {
+        var data = JSON.parse(e.target.response);
+        document.getElementById("predict").textContent = data.predict;
+    };
+    xhr.open("POST", "/classify/Rawtext", true);
+    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    xhr.setRequestHeader("Content-type", "application/json");
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    var text = document.getElementById("text").textContent;
+
+    if (text === ""){
+      document.getElementById("predict").textContent = "Введите текст для классификации";
+      return false;
+    }
+
+    data = {
+      "text":text
+    };
+    xhr.send(JSON.stringify(data));
+    return false;
+}
+</script>
+{% endblock %}
+
+<style>
+table {
+  table-layout: fixed;
+}
+</style>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+  <link rel="stylesheet" href="https://static.pingendo.com/bootstrap/bootstrap-4.3.1.css">
+</head>
+<body >
+  <div class="py-5 text-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1 id="nameFile">Узнать к какой категории относится текст</h1>
+          <h2>(Доступные категории: Политика, Культура, Происшествия)</h2>
+          <h2 id="predict"></h2>
+        </div>
+      </div>
+    </div>
+  </div>
+  <form onsubmit=saveChange()>
+    {% csrf_token %}
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr align="center">
+                  <th>Текст</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td contenteditable id="text">{{text}}</td>
+                </tr>
+              </tbody>
+            </table>
+            <input type="button" value="На главную" onClick='location.href="/"'>
+            <input type="button" value="Узнать категорию" onClick='getPredict()'>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </form>
+ <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+</body>
+</html>
