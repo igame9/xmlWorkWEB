@@ -109,7 +109,7 @@ def nlp(request):
         dataFrame = pd.DataFrame(listStr, columns=("Text", "class"))
         print(dataFrame)
         dataFrame.to_csv('dataFrame.csv', index=False)
-        return HttpResponse("Составление векторов признаков")
+        return HttpResponse("Датасет создан")
 
 
 def learnModel(request):
@@ -140,5 +140,5 @@ def accuracyClassif(request):
         y = dataSet['class']
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=10)
         predict = loadedClassif.predict(X_test)
-        # print(classification_report(KNNPredict, y_test))
+        print(classification_report(predict, y_test))
         return HttpResponse(accuracy_score(predict, y_test))

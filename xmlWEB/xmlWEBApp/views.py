@@ -135,7 +135,7 @@ def newXML(request):
             day, month, year = str(dateTime).replace("[", "").replace("]", "").replace("'", "").split(".")
             checkDate = date(int(year), int(month), int(day))
         except ValueError:
-            return HttpResponse(json.dumps("Некорректная дата"))
+            return HttpResponse(json.dumps("Некорректная дата. Введите дату в формате 'День.Месяц.Год'"))
         else:
             correct = correct + 1
 
