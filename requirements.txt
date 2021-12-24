@@ -9,4 +9,3 @@ scikit-learn~=1.0
 natasha~=1.4.0
 pandas~=1.3.4
 rutermextract~=0.3
-selenium~=4.0.0
